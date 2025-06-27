@@ -4,18 +4,17 @@ import logfire
 from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStdio
 
-logfire.configure(service_name='mcp-sampling-client')
+logfire.configure(service_name='mcp-client', environment='mcp-sampling')
 logfire.instrument_pydantic_ai()
 logfire.instrument_mcp()
 
-THIS_DIR = Path(__file__).parent
-server = MCPServerStdio(command='python', args=[str(THIS_DIR / 'generate_svg.py')])
+server = MCPServerStdio(command='python', args=[str(Path(__file__).parent / 'generate_svg.py')])
 agent = Agent('openai:gpt-4.1-mini', mcp_servers=[server])
 
 
 async def main():
     async with agent.run_mcp_servers():
-        result = await agent.run('Create an image of a robot in a punk style.')
+        result = await agent.run('Create an image of a robot in a punk style, it should be pink.')
     print(result.output)
 
 

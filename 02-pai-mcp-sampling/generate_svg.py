@@ -1,37 +1,32 @@
 import re
 from pathlib import Path
 
-from mcp import SamplingMessage
+import logfire
 from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.session import ServerSessionT
 from mcp.shared.context import LifespanContextT, RequestT
-from mcp.types import TextContent
+from pydantic_ai import Agent
+from pydantic_ai.models.mcp_sampling import MCPSamplingModel
+
+logfire.configure(service_name='mcp-server', environment='mcp-sampling', console=False)
+logfire.instrument_mcp()
 
 app = FastMCP(log_level='WARNING')
 
-import logfire
-
-logfire.configure(service_name='mcp-sampling-server', console=False)
-logfire.instrument_mcp()
+svg_agent = Agent(instructions='Generate an SVG image as per the user input. Return the SVG data only as a string.')
 
 
 @app.tool()
 async def image_generator(ctx: Context[ServerSessionT, LifespanContextT, RequestT], subject: str, style: str) -> str:
-    prompt = f'{subject=} {style=}'
-    # `ctx.session.create_message` is the sampling call
-    result = await ctx.session.create_message(
-        [SamplingMessage(role='user', content=TextContent(type='text', text=prompt))],
-        max_tokens=1_024,
-        system_prompt='Generate an SVG image as per the user input',
-    )
-    assert isinstance(result.content, TextContent)
+    # run the agent, using MCPSamplingModel to proxy the LLM call through the client.
+    svg_result = await svg_agent.run(f'{subject=} {style=}', model=MCPSamplingModel(ctx.session))
 
     path = Path(f'{subject}_{style}.svg')
     # remove triple backticks if the svg was returned within markdown
-    if m := re.search(r'^```\w*$(.+?)```$', result.content.text, re.S | re.M):
+    if m := re.search(r'^```\w*$(.+?)```$', svg_result.output, re.S | re.M):
         path.write_text(m.group(1))
     else:
-        path.write_text(result.content.text)
+        path.write_text(svg_result.output)
     return f'See {path}'
 
 
