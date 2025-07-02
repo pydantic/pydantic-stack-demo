@@ -11,3 +11,4 @@ wheels/
 .venv
 *.svg
 scratch/
+.self-improving-agent/
