@@ -1072,6 +1072,7 @@ dependencies = [
     { name = "logfire", extra = ["fastapi", "httpx"] },
     { name = "pydantic" },
     { name = "pydantic-ai" },
+    { name = "pydantic-evals" },
     { name = "uvicorn" },
 ]
 
@@ -1083,6 +1084,7 @@ requires-dist = [
     { name = "logfire", extras = ["fastapi", "httpx"], specifier = ">=3.21.1" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-ai", specifier = ">=0.3.4" },
+    { name = "pydantic-evals", specifier = ">=0.3.4" },
     { name = "uvicorn", specifier = ">=0.34.3" },
 ]
 
