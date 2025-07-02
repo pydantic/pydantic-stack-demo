@@ -2,12 +2,6 @@ version = 1
 revision = 2
 requires-python = ">=3.12"
 
-[manifest]
-members = [
-    "human-seeded-evals",
-    "pydantic-demo",
-]
-
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -488,47 +482,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a4/01/bfe0534a63ce7a2285e90dbb33e8a5b815ff096d8f7743b135c256916589/huggingface_hub-0.33.1.tar.gz", hash = "sha256:589b634f979da3ea4b8bdb3d79f97f547840dc83715918daf0b64209c0844c7b", size = 426728, upload-time = "2025-06-25T12:02:57.605Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d0/fb/5307bd3612eb0f0e62c3a916ae531d3a31e58fb5c82b58e3ebf7fd6f47a1/huggingface_hub-0.33.1-py3-none-any.whl", hash = "sha256:ec8d7444628210c0ba27e968e3c4c973032d44dcea59ca0d78ef3f612196f095", size = 515377, upload-time = "2025-06-25T12:02:55.611Z" },
-]
-
-[[package]]
-name = "human-seeded-evals"
-version = "0.1.0"
-source = { virtual = "human-seeded-evals" }
-dependencies = [
-    { name = "cloudkv" },
-    { name = "devtools" },
-    { name = "fastapi" },
-    { name = "httpx" },
-    { name = "logfire", extra = ["fastapi", "httpx"] },
-    { name = "pydantic" },
-    { name = "pydantic-ai" },
-    { name = "uvicorn" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pyright" },
-    { name = "ruff" },
-    { name = "watchfiles" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "cloudkv", specifier = ">=0.3.0" },
-    { name = "devtools", specifier = ">=0.12.2" },
-    { name = "fastapi", specifier = ">=0.115.14" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "logfire", extras = ["fastapi", "httpx"], specifier = ">=3.21.1" },
-    { name = "pydantic", specifier = ">=2.11.7" },
-    { name = "pydantic-ai", specifier = ">=0.3.4" },
-    { name = "uvicorn", specifier = ">=0.34.3" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pyright", specifier = ">=1.1.402" },
-    { name = "ruff", specifier = ">=0.12.1" },
-    { name = "watchfiles", specifier = ">=1.1.0" },
 ]
 
 [[package]]

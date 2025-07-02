@@ -429,9 +429,9 @@ def get_instrunctions(messages: list[ModelMessage]) -> str | None:
 
 def get_tools_fields(tools: list[ToolDefinition], prefix: str, description: str) -> Iterable[FieldDetails]:
     for t in tools:
-        prefix = f'{prefix}.{escape_key(t.name)}'
-        yield FieldDetails(f'{prefix}.description', description, t.description)
-        yield from json_schema_fields(t.parameters_json_schema, f'{prefix}.parameters')
+        tool_prefix = f'{prefix}.{escape_key(t.name)}'
+        yield FieldDetails(f'{tool_prefix}.description', description, t.description)
+        yield from json_schema_fields(t.parameters_json_schema, f'{tool_prefix}.parameters')
 
 
 JsonSchema = dict[str, Any]

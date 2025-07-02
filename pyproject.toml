@@ -19,10 +19,6 @@ dependencies = [
 [dependency-groups]
 dev = ["pyright>=1.1.402", "ruff>=0.12.1", "watchfiles>=1.1.0"]
 
-
-[tool.uv.workspace]
-members = ["human-seeded-evals"]
-
 [tool.ruff]
 line-length = 120
 target-version = "py39"

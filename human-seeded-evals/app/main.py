@@ -11,6 +11,7 @@ from .self_improving_agent import SelfImprovingAgentModel
 logfire.configure(environment='dev')
 
 logfire.instrument_pydantic_ai()
+logfire.instrument_httpx()
 
 
 @asynccontextmanager

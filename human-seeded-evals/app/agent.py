@@ -6,13 +6,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import AsyncIterator
 
-from cloudkv import AsyncCloudKV
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models import Model
 
 from .models import TimeRangeInputs, TimeRangeResponse
 from .self_improving_agent import SelfImprovingAgentModel
-from .self_improving_agent_storage import CloudKVStorage
+from .self_improving_agent_storage import LocalStorage
 
 
 @dataclass
@@ -32,13 +31,14 @@ time_range_agent = Agent[TimeRangeDeps, TimeRangeResponse](
 
 @asynccontextmanager
 async def self_improving_model() -> AsyncIterator[SelfImprovingAgentModel]:
-    cloudkv_read_token, cloudkv_write_token = os.environ['CLOUDKV_TOKEN'].split('.')
     logfire_read_token = os.environ['LOGFIRE_READ_TOKEN']
-    async with AsyncCloudKV(cloudkv_read_token, cloudkv_write_token) as cloudkv:
-        storage = CloudKVStorage(cloudkv)
-        m = SelfImprovingAgentModel('anthropic:claude-sonnet-4-0', storage, logfire_read_token, 'time_range_agent')
-        yield m
-        await m.wait_for_coach()
+    # cloudkv_read_token, cloudkv_write_token = os.environ['CLOUDKV_TOKEN'].split('.')
+    # async with AsyncCloudKV(cloudkv_read_token, cloudkv_write_token) as cloudkv:
+    #     storage = CloudKVStorage(cloudkv)
+    storage = LocalStorage()
+    m = SelfImprovingAgentModel('anthropic:claude-sonnet-4-0', storage, logfire_read_token, 'time_range_agent')
+    yield m
+    await m.wait_for_coach()
 
 
 @time_range_agent.instructions
