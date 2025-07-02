@@ -1,0 +1,21 @@
+[project]
+name = "human-seeded-evals"
+version = "0.1.0"
+readme = "README.md"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+extend-select = ["Q", "RUF100", "C90", "UP", "I"]
+flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
+isort = { combine-as-imports = true }
+mccabe = { max-complexity = 15 }
+pydocstyle = { convention = "google" }
+
+[tool.ruff.format]
+quote-style = "single"
+
+[dependency-groups]
+dev = ["pyright>=1.1.402", "ruff>=0.12.1", "watchfiles>=1.1.0"]
