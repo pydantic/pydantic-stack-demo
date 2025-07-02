@@ -1,0 +1,1721 @@
+{
+  "cases": [
+    {
+      "name": "Last 2 hour",
+      "inputs": {
+        "prompt": "Last 2 hour",
+        "now": "2025-05-01T05:41:30.311402Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-01T03:41:30Z",
+        "end_timestamp": "2025-05-01T05:41:30Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "yesterday from 4pm to 6pm",
+      "inputs": {
+        "prompt": "yesterday from 4pm to 6pm",
+        "now": "2025-05-01T09:31:57.169821Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-04-30T16:00:00Z",
+        "end_timestamp": "2025-04-30T18:00:00Z",
+        "explanation": "Selected the time range from 4 PM to 6 PM UTC yesterday, assuming UTC as the timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5 minutes around 05/02/2025, 02:30:10",
+      "inputs": {
+        "prompt": "5 minutes around 05/02/2025, 02:30:10",
+        "now": "2025-05-02T08:38:41.16289Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-02T02:27:40Z",
+        "end_timestamp": "2025-05-02T02:32:40Z",
+        "explanation": "Selected a 5-minute window around the specified time on May 2, 2025, assuming UTC time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5 minutes around 05/02/2025, 10:22:53 UTC",
+      "inputs": {
+        "prompt": "5 minutes around 05/02/2025, 10:22:53 UTC",
+        "now": "2025-05-02T08:54:49.342444Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-02T10:20:23Z",
+        "end_timestamp": "2025-05-02T10:25:23Z",
+        "explanation": "Selected a 5-minute window around the specified UTC time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "from now to 4.5 hours ago",
+      "inputs": {
+        "prompt": "from now to 4.5 hours ago",
+        "now": "2025-05-03T06:07:47.105207Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-02T20:37:47Z",
+        "end_timestamp": "2025-05-03T06:07:47Z",
+        "explanation": "Selected the last 4.5-hour window up to the current time in UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last three months",
+      "inputs": {
+        "prompt": "last three months",
+        "now": "2025-05-04T11:40:15.198504Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2024-02-04T00:00:00Z",
+        "end_timestamp": "2025-05-04T11:40:15Z",
+        "explanation": "Includes the last 90 days up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last minute",
+      "inputs": {
+        "prompt": "last minute",
+        "now": "2025-05-06T09:36:27.819513Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-06T09:35:00Z",
+        "end_timestamp": "2025-05-06T09:36:00Z",
+        "explanation": "Selected the last minute leading up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 5 minutes",
+      "inputs": {
+        "prompt": "last 5 minutes",
+        "now": "2025-05-06T22:40:49.871987Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-06T22:35:49Z",
+        "end_timestamp": "2025-05-06T22:40:49Z",
+        "explanation": "Selected the most recent 5-minute time range up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5 minutes around 05/05/2025, 20:17:20 UTC 2",
+      "inputs": {
+        "prompt": "5 minutes around 05/05/2025, 20:17:20 UTC 2",
+        "now": "2025-05-07T19:26:37.561819Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-05T20:14:50+02:00",
+        "end_timestamp": "2025-05-05T20:19:50+02:00",
+        "explanation": "Selected a 10-minute window around the specified time in UTC+2."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "May 07 09:43:36 AM",
+      "inputs": {
+        "prompt": "May 07 09:43:36 AM",
+        "now": "2025-05-08T07:01:40.83444Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-07T09:38:36Z",
+        "end_timestamp": "2025-05-07T09:48:36Z",
+        "explanation": "Selected a 10-minute window around the specified time. Assuming the user means May 07 in the current year."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "May 07 09-12",
+      "inputs": {
+        "prompt": "May 07 09-12",
+        "now": "2025-05-08T07:09:34.616432Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-07T09:00:00Z",
+        "end_timestamp": "2025-05-07T12:00:00Z",
+        "explanation": "Assumed the user is referring to May 07 of the current year (2025), selecting the time range from 9 AM to 12 PM in UTC as no timezone was specified."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5 days ago to 3 days ago",
+      "inputs": {
+        "prompt": "5 days ago to 3 days ago",
+        "now": "2025-05-09T00:16:10.399851Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-04T00:00:00Z",
+        "end_timestamp": "2025-05-06T00:00:00Z",
+        "explanation": "Includes the period from midnight 5 days ago up to midnight 3 days ago, assuming current date is May 9, 2025."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "May 07 09:59:58 AM",
+      "inputs": {
+        "prompt": "May 07 09:59:58 AM",
+        "now": "2025-05-09T14:06:26.328516Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-07T09:59:58Z",
+        "end_timestamp": "2025-05-07T10:09:58Z",
+        "explanation": "Selected a 10-minute window around the specified time in the past 24 hours. Assumed UTC as the time zone because none was specified."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 1 minute",
+      "inputs": {
+        "prompt": "last 1 minute",
+        "now": "2025-05-10T08:59:55.203268Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-10T08:58:55Z",
+        "end_timestamp": "2025-05-10T08:59:55Z",
+        "explanation": "Includes the most recent minute up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5 minutes around  4:50 PM today",
+      "inputs": {
+        "prompt": "5 minutes around  4:50 PM today",
+        "now": "2025-05-10T15:19:35.66583Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-10T16:47:30Z",
+        "end_timestamp": "2025-05-10T16:52:30Z",
+        "explanation": "Selected a 5-minute window around 4:50 PM UTC as the user did not specify a timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5 minutes around  4:50 PM today (Madrid timezone)",
+      "inputs": {
+        "prompt": "5 minutes around  4:50 PM today (Madrid timezone)",
+        "now": "2025-05-10T15:19:54.743878Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-10T16:45:00+02:00",
+        "end_timestamp": "2025-05-10T16:55:00+02:00",
+        "explanation": "Selected a 10-minute window around 4:50 PM local Madrid time today."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Lawt year",
+      "inputs": {
+        "prompt": "Lawt year",
+        "now": "2025-05-12T00:23:07.37249Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range for 'Lawt year'. Assuming a typo and looking for 'last year', but data retention only allows for the past 30 days."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "YTD",
+      "inputs": {
+        "prompt": "YTD",
+        "now": "2025-05-12T00:23:14.844515Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2024-12-31T00:00:00Z",
+        "end_timestamp": "2025-05-12T00:23:14Z",
+        "explanation": "Includes data from January 1st of the current year until now, in UTC time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 2 hours",
+      "inputs": {
+        "prompt": "last 2 hours",
+        "now": "2025-05-12T20:03:37.934219Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-12T18:03:37Z",
+        "end_timestamp": "2025-05-12T20:03:37Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 3 hours",
+      "inputs": {
+        "prompt": "last 3 hours",
+        "now": "2025-05-12T20:04:48.225424Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-12T17:04:48Z",
+        "end_timestamp": "2025-05-12T20:04:48Z",
+        "explanation": "Includes a time range of the last 3 hours up to the current moment."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 24h",
+      "inputs": {
+        "prompt": "last 24h",
+        "now": "2025-05-12T21:45:03.1054Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-11T21:45:03Z",
+        "end_timestamp": "2025-05-12T21:45:03Z",
+        "explanation": "Includes the last 24 hours up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "May 9 22.20-22.30",
+      "inputs": {
+        "prompt": "May 9 22.20-22.30",
+        "now": "2025-05-13T09:04:43.915607Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-09T22:20:00Z",
+        "end_timestamp": "2025-05-09T22:30:00Z",
+        "explanation": "Selected a 10-minute window on May 9th from 22:20 to 22:30 UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "1 minute",
+      "inputs": {
+        "prompt": "1 minute",
+        "now": "2025-05-13T21:32:38.560997Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range from '1 minute.' Please provide additional context or a specific point in time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "2025-05-14T12:24:26.292184 to  2025-05-14T12:17:11.456767",
+      "inputs": {
+        "prompt": "2025-05-14T12:24:26.292184 to  2025-05-14T12:17:11.456767",
+        "now": "2025-05-14T12:39:58.599608Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-14T12:17:11.456767Z",
+        "end_timestamp": "2025-05-14T12:24:26.292184Z",
+        "explanation": "Use the provided timestamps to filter for spans at 16:24 UTC today."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": " 2025-05-14T12:17:11.456767 to 2025-05-14T12:24:26.292184",
+      "inputs": {
+        "prompt": " 2025-05-14T12:17:11.456767 to 2025-05-14T12:24:26.292184",
+        "now": "2025-05-14T12:40:09.612873Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-14T12:17:11Z",
+        "end_timestamp": "2025-05-14T12:24:26Z",
+        "explanation": "The time range is set using the exact timestamps provided, with UTC as the timezone assuming there were no specific timezone instructions."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "19:37:42",
+      "inputs": {
+        "prompt": "19:37:42",
+        "now": "2025-05-14T17:42:33.77023Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-13T19:32:42Z",
+        "end_timestamp": "2025-05-13T19:42:42Z",
+        "explanation": "Selected a 10-minute window around the specified time yesterday since the provided time is later than now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "1minute",
+      "inputs": {
+        "prompt": "1minute",
+        "now": "2025-05-14T19:43:59.130267Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range from the prompt '1minute'."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "5/16/2025, 12:36:39 PM to 5/16/2025, 12:45:49 PM",
+      "inputs": {
+        "prompt": "5/16/2025, 12:36:39 PM to 5/16/2025, 12:45:49 PM",
+        "now": "2025-05-16T22:45:39.815545Z"
+      },
+      "expected_output": {
+        "error": "The specified time range is in the future and cannot be used to filter data, which is only available for past events."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "5/16/2025 12:36:39 PM to 5/16/2025 12:45:49 PM",
+      "inputs": {
+        "prompt": "5/16/2025 12:36:39 PM to 5/16/2025 12:45:49 PM",
+        "now": "2025-05-16T22:45:48.81708Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-16T12:36:39Z",
+        "end_timestamp": "2025-05-16T12:45:49Z",
+        "explanation": "Assumed the time is provided in UTC. Selected the specified time interval."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5/16/2025 12:36:39 PM to 5/16/2025 12:45:49 PM US Central",
+      "inputs": {
+        "prompt": "5/16/2025 12:36:39 PM to 5/16/2025 12:45:49 PM US Central",
+        "now": "2025-05-16T22:45:59.964266Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-16T12:36:39-05:00",
+        "end_timestamp": "2025-05-16T12:45:49-05:00",
+        "explanation": "Selected the specified time range with US Central timezone offset."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last three days",
+      "inputs": {
+        "prompt": "last three days",
+        "now": "2025-05-19T11:26:02.062781Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-16T11:26:02Z",
+        "end_timestamp": "2025-05-19T11:26:02Z",
+        "explanation": "Includes the last three days up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last two days",
+      "inputs": {
+        "prompt": "last two days",
+        "now": "2025-05-19T11:26:28.542076Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-17T00:00:00Z",
+        "end_timestamp": "2025-05-19T11:26:28Z",
+        "explanation": "Includes data from the last two complete days up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Since the pope was elected",
+      "inputs": {
+        "prompt": "Since the pope was elected",
+        "now": "2025-05-19T11:26:46.986403Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range as the prompt does not specify a date or period related to when the pope was elected."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "Since the ides of march",
+      "inputs": {
+        "prompt": "Since the ides of march",
+        "now": "2025-05-19T11:27:14.807622Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-03-15T00:00:00Z",
+        "end_timestamp": "2025-05-19T11:27:14Z",
+        "explanation": "The Ides of March refers to March 15th, hence starting the range from midnight on that date up to the current time. Assume UTC for unspecified timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Since the start of corona",
+      "inputs": {
+        "prompt": "Since the start of corona",
+        "now": "2025-05-19T11:27:29.327719Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range for 'the start of corona'. Please provide more specific dates or time range."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "Since the start of the corona pandemic",
+      "inputs": {
+        "prompt": "Since the start of the corona pandemic",
+        "now": "2025-05-19T11:27:38.276698Z"
+      },
+      "expected_output": {
+        "error": "The request 'Since the start of the corona pandemic' does not specify a valid time range within the last 30 days."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "Since Trump was elected",
+      "inputs": {
+        "prompt": "Since Trump was elected",
+        "now": "2025-05-19T11:27:59.568996Z"
+      },
+      "expected_output": {
+        "error": "The timeframe 'since Trump was elected' is too ambiguous for precise conversion, and historical coverage limits apply."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "6:37 today",
+      "inputs": {
+        "prompt": "6:37 today",
+        "now": "2025-05-19T12:54:21.103248Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-19T06:32:00Z",
+        "end_timestamp": "2025-05-19T06:42:00Z",
+        "explanation": "Selected a 10-minute window around 6:37 AM today, assuming UTC time since no timezone was specified."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last one minute",
+      "inputs": {
+        "prompt": "last one minute",
+        "now": "2025-05-19T13:54:54.593349Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-19T13:53:54Z",
+        "end_timestamp": "2025-05-19T13:54:54Z",
+        "explanation": "Selected the last minute up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 30 minutes",
+      "inputs": {
+        "prompt": "last 30 minutes",
+        "now": "2025-05-19T20:11:41.346068Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-19T19:41:41Z",
+        "end_timestamp": "2025-05-19T20:11:41Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last night's overnight's shift",
+      "inputs": {
+        "prompt": "last night's overnight's shift",
+        "now": "2025-05-20T12:24:07.8895Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-19T22:00:00Z",
+        "end_timestamp": "2025-05-20T06:00:00Z",
+        "explanation": "Assumed the overnight shift started at 10 PM and ended at 6 AM UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last two hours",
+      "inputs": {
+        "prompt": "last two hours",
+        "now": "2025-05-20T16:05:23.657327Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-20T14:05:23Z",
+        "end_timestamp": "2025-05-20T16:05:23Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "yesterday 4 - 6p pt",
+      "inputs": {
+        "prompt": "yesterday 4 - 6p pt",
+        "now": "2025-05-21T04:42:59.059277Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-19T16:00:00-07:00",
+        "end_timestamp": "2025-05-19T18:00:00-07:00",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Last 2 minutes",
+      "inputs": {
+        "prompt": "Last 2 minutes",
+        "now": "2025-05-21T12:03:03.948738Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-21T12:01:03Z",
+        "end_timestamp": "2025-05-21T12:03:03Z",
+        "explanation": "Includes the last 2 minutes up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 20 minutes",
+      "inputs": {
+        "prompt": "last 20 minutes",
+        "now": "2025-05-21T17:39:14.441124Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-21T17:19:14Z",
+        "end_timestamp": "2025-05-21T17:39:14Z",
+        "explanation": "Selected the time range starting 20 minutes before the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "today",
+      "inputs": {
+        "prompt": "today",
+        "now": "2025-05-21T17:45:18.842241Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-21T00:00:00Z",
+        "end_timestamp": "2025-05-21T17:45:18Z",
+        "explanation": "Includes all of today from midnight to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last day",
+      "inputs": {
+        "prompt": "last day",
+        "now": "2025-05-21T18:56:20.77286Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-20T18:56:20Z",
+        "end_timestamp": "2025-05-21T18:56:20Z",
+        "explanation": "Includes the last 24 hours in UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "I want the good times",
+      "inputs": {
+        "prompt": "I want the good times",
+        "now": "2025-05-22T07:40:50.130171Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range based on the user's request."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "When was there most problems and errors",
+      "inputs": {
+        "prompt": "When was there most problems and errors",
+        "now": "2025-05-22T07:41:06.025424Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range from the provided prompt."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "Largest amount or errors",
+      "inputs": {
+        "prompt": "Largest amount or errors",
+        "now": "2025-05-22T07:41:19.271831Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range due to insufficient context provided."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "May 1998",
+      "inputs": {
+        "prompt": "May 1998",
+        "now": "2025-05-22T07:41:37.561287Z"
+      },
+      "expected_output": {
+        "error": "The specified time range 'May 1998' is outside the bounds of the available data, which is limited to the past 30 days."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "the day before yesterday",
+      "inputs": {
+        "prompt": "the day before yesterday",
+        "now": "2025-05-22T07:41:57.575321Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-20T00:00:00Z",
+        "end_timestamp": "2025-05-21T00:00:00Z",
+        "explanation": "Includes all of the day before yesterday from midnight to midnight UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 24 hours",
+      "inputs": {
+        "prompt": "last 24 hours",
+        "now": "2025-05-22T13:31:40.607186Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-21T13:31:40Z",
+        "end_timestamp": "2025-05-22T13:31:40Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 3 minutes",
+      "inputs": {
+        "prompt": "last 3 minutes",
+        "now": "2025-05-22T14:27:37.642684Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-22T14:24:37Z",
+        "end_timestamp": "2025-05-22T14:27:37Z",
+        "explanation": "Selected the last 3 minutes up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "F10 mins",
+      "inputs": {
+        "prompt": "F10 mins",
+        "now": "2025-05-23T10:03:46.216558Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range from the input 'F10 mins'."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "F0 mins",
+      "inputs": {
+        "prompt": "F0 mins",
+        "now": "2025-05-23T10:03:52.323397Z"
+      },
+      "expected_output": {
+        "error": "Unable to determine a specific time range based on 'F0 mins'."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "10 mins",
+      "inputs": {
+        "prompt": "10 mins",
+        "now": "2025-05-23T10:03:55.105016Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-23T09:53:55Z",
+        "end_timestamp": "2025-05-23T10:03:55Z",
+        "explanation": "Selected the last 10 minutes up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "this hour",
+      "inputs": {
+        "prompt": "this hour",
+        "now": "2025-05-23T10:32:02.316016Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-23T10:00:00Z",
+        "end_timestamp": "2025-05-23T11:00:00Z",
+        "explanation": "Selected the current hour from the start until the end."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last hour",
+      "inputs": {
+        "prompt": "last hour",
+        "now": "2025-05-23T11:58:24.662938Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-23T10:58:24Z",
+        "end_timestamp": "2025-05-23T11:58:24Z",
+        "explanation": "Includes the last hour up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "around 4pm yesterday",
+      "inputs": {
+        "prompt": "around 4pm yesterday",
+        "now": "2025-05-23T14:01:06.266425Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-22T15:55:00Z",
+        "end_timestamp": "2025-05-22T16:05:00Z",
+        "explanation": "Selected a 10-minute window around 4 PM UTC yesterday as the specified time is ambiguous in terms of timezone. Assumed UTC as the timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "around 4pm yesterday afternoon",
+      "inputs": {
+        "prompt": "around 4pm yesterday afternoon",
+        "now": "2025-05-23T14:14:20.917264Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-22T15:55:00Z",
+        "end_timestamp": "2025-05-22T16:05:00Z",
+        "explanation": "Selected a 10-minute window around 4 PM yesterday afternoon, using UTC as the timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Today between 5 and 7am",
+      "inputs": {
+        "prompt": "Today between 5 and 7am",
+        "now": "2025-05-24T09:41:22.078545Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-24T05:00:00Z",
+        "end_timestamp": "2025-05-24T07:00:00Z",
+        "explanation": "Assumed the user meant today in UTC, covering the specified time range this morning."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "13 hours ago",
+      "inputs": {
+        "prompt": "13 hours ago",
+        "now": "2025-05-26T06:42:43.875029Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-25T17:00:00Z",
+        "end_timestamp": "2025-05-25T18:00:00Z",
+        "explanation": "Selected an hour interval around 13 hours ago."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "all the logs that came on 23 may",
+      "inputs": {
+        "prompt": "all the logs that came on 23 may",
+        "now": "2025-05-26T14:47:46.088259Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-23T00:00:00Z",
+        "end_timestamp": "2025-05-24T00:00:00Z",
+        "explanation": "Includes all logs from May 23, 2025, from midnight to midnight UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last three houres",
+      "inputs": {
+        "prompt": "last three houres",
+        "now": "2025-05-26T19:30:39.802552Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-26T16:30:39Z",
+        "end_timestamp": "2025-05-26T19:30:39Z",
+        "explanation": "Covers the time range from three hours ago up to the current time. UTC timezone was used as no specific timezone was specified."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "everything on 26th may",
+      "inputs": {
+        "prompt": "everything on 26th may",
+        "now": "2025-05-27T07:08:45.62144Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-26T00:00:00Z",
+        "end_timestamp": "2025-05-27T00:00:00Z",
+        "explanation": "Includes all data from May 26, 2025, from midnight to midnight UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "this year",
+      "inputs": {
+        "prompt": "this year",
+        "now": "2025-05-27T14:12:34.592669Z"
+      },
+      "expected_output": {
+        "error": "Only the last 30 days are available."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "2 days prior",
+      "inputs": {
+        "prompt": "2 days prior",
+        "now": "2025-05-29T18:00:00.23461Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-27T00:00:00Z",
+        "end_timestamp": "2025-05-29T00:00:00Z",
+        "explanation": "Covers the last two full days."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "every log on 28 may",
+      "inputs": {
+        "prompt": "every log on 28 may",
+        "now": "2025-05-30T07:08:32.733485Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-28T00:00:00Z",
+        "end_timestamp": "2025-05-29T00:00:00Z",
+        "explanation": "Includes all logs for May 28, 2025, from midnight to midnight in UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "yesterday full",
+      "inputs": {
+        "prompt": "yesterday full",
+        "now": "2025-05-30T08:39:55.438394Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-29T00:00:00Z",
+        "end_timestamp": "2025-05-30T00:00:00Z",
+        "explanation": "Includes all of yesterday from midnight to midnight."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "-15m",
+      "inputs": {
+        "prompt": "-15m",
+        "now": "2025-05-30T13:11:40.247323Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-30T12:56:40Z",
+        "end_timestamp": "2025-05-30T13:11:40Z",
+        "explanation": "Selected the past 15 minutes from now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "real time",
+      "inputs": {
+        "prompt": "real time",
+        "now": "2025-05-30T13:16:28.882284Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-04-30T13:16:28Z",
+        "end_timestamp": "2025-04-30T13:16:28Z",
+        "explanation": "Selected the current time as both the minimum and maximum timestamp for real-time data."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 15 min",
+      "inputs": {
+        "prompt": "last 15 min",
+        "now": "2025-06-03T01:38:12.246178Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-03T01:23:12Z",
+        "end_timestamp": "2025-06-03T01:38:12Z",
+        "explanation": "Includes data from the last 15 minutes up to now, using UTC timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 7 days",
+      "inputs": {
+        "prompt": "last 7 days",
+        "now": "2025-06-03T04:07:10.345668Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-27T04:07:10Z",
+        "end_timestamp": "2025-06-03T04:07:10Z",
+        "explanation": "Includes the last 7 days up to now."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "30 day",
+      "inputs": {
+        "prompt": "30 day",
+        "now": "2025-06-03T16:26:27.901725Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-05-04T16:26:27Z",
+        "end_timestamp": "2025-06-03T16:26:27Z",
+        "explanation": "Include the last 30 days."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "-23min",
+      "inputs": {
+        "prompt": "-23min",
+        "now": "2025-06-03T16:39:03.489455Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-03T16:16:03Z",
+        "end_timestamp": "2025-06-03T16:39:03Z",
+        "explanation": "The time range covers the last 23 minutes up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "yesterday between 3 and 4 PM PST",
+      "inputs": {
+        "prompt": "yesterday between 3 and 4 PM PST",
+        "now": "2025-06-04T18:21:34.734575Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-03T15:00:00-08:00",
+        "end_timestamp": "2025-06-03T16:00:00-08:00",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "4pm yesterday",
+      "inputs": {
+        "prompt": "4pm yesterday",
+        "now": "2025-06-04T18:38:39.314292Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-03T16:00:00Z",
+        "end_timestamp": "2025-06-03T16:10:00Z",
+        "explanation": "Selected a 10-minute window around 4 PM UTC yesterday. Assumed UTC since no timezone was specified."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "june 4 all",
+      "inputs": {
+        "prompt": "june 4 all",
+        "now": "2025-06-05T11:09:08.53123Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-04T00:00:00Z",
+        "end_timestamp": "2025-06-05T00:00:00Z",
+        "explanation": "Selected the entirety of June 4th, 2025 from midnight to midnight in UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "june 4 6pm to 6:30 pm",
+      "inputs": {
+        "prompt": "june 4 6pm to 6:30 pm",
+        "now": "2025-06-05T11:09:39.44352Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-04T18:00:00Z",
+        "end_timestamp": "2025-06-04T18:30:00Z",
+        "explanation": "Since the specific day is in the past 24 hours, selected the times on June 4, 2025, in UTC timezone."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "june 4 6:00pm to 6:30pm",
+      "inputs": {
+        "prompt": "june 4 6:00pm to 6:30pm",
+        "now": "2025-06-05T11:10:10.877532Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-04T18:00:00Z",
+        "end_timestamp": "2025-06-04T18:30:00Z",
+        "explanation": "Assumed UTC timezone, selecting June 4th within the past 30 days range."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "12:34:00 to 12:35",
+      "inputs": {
+        "prompt": "12:34:00 to 12:35",
+        "now": "2025-06-05T16:39:48.452375Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-05T12:34:00Z",
+        "end_timestamp": "2025-06-05T12:35:00Z",
+        "explanation": "Assuming the user wants a time range today based on the current time and includes the same minute but the following hour in the past 24-hour period (UTC)."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "16:24",
+      "inputs": {
+        "prompt": "16:24",
+        "now": "2025-06-06T13:49:30.71593Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-05T16:19:00Z",
+        "end_timestamp": "2025-06-05T16:29:00Z",
+        "explanation": "Selected a 10-minute window around 16:24 assuming the time is in the past 24 hours as the specific day was not mentioned, using UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "5mins",
+      "inputs": {
+        "prompt": "5mins",
+        "now": "2025-06-11T12:36:54.176109Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-11T12:31:54Z",
+        "end_timestamp": "2025-06-11T12:36:54Z",
+        "explanation": "Includes the last 5 minutes up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "11:30am to 12pm",
+      "inputs": {
+        "prompt": "11:30am to 12pm",
+        "now": "2025-06-12T02:24:56.267486Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-11T11:30:00Z",
+        "end_timestamp": "2025-06-11T12:00:00Z",
+        "explanation": "Assumed the time range is for the past day based on the current time (June 12, 2025, 02:24:56 UTC), and times are interpreted in UTC due to lack of timezone specification."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Last 2 hours",
+      "inputs": {
+        "prompt": "Last 2 hours",
+        "now": "2025-06-13T22:24:14.499335Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-13T20:24:14Z",
+        "end_timestamp": "2025-06-13T22:24:14Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "May",
+      "inputs": {
+        "prompt": "May",
+        "now": "2025-06-16T06:38:52.402917Z"
+      },
+      "expected_output": {
+        "error": "Cannot determine a specific time range for 'May' without the context of a specific year or additional instructions."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "may 2025",
+      "inputs": {
+        "prompt": "may 2025",
+        "now": "2025-06-16T06:39:01.593593Z"
+      },
+      "expected_output": {
+        "error": "The specified time is outside the available data range. Only data from the last 30 days is available, and it is currently June 16, 2025."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderError"
+        }
+      ]
+    },
+    {
+      "name": "Last 1 minute",
+      "inputs": {
+        "prompt": "Last 1 minute",
+        "now": "2025-06-16T15:40:55.858785Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-16T15:39:55Z",
+        "end_timestamp": "2025-06-16T15:40:55Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "June 13",
+      "inputs": {
+        "prompt": "June 13",
+        "now": "2025-06-17T08:29:26.756514Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-13T00:00:00Z",
+        "end_timestamp": "2025-06-13T23:59:59Z",
+        "explanation": "Selected the entire day of June 13 in the past 24 hours, using UTC timezone for clarity."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 21 hrs",
+      "inputs": {
+        "prompt": "last 21 hrs",
+        "now": "2025-06-17T21:40:54.550569Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-16T00:40:54Z",
+        "end_timestamp": "2025-06-17T21:40:54Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "today from 6 am to now",
+      "inputs": {
+        "prompt": "today from 6 am to now",
+        "now": "2025-06-20T12:07:40.299535Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-20T06:00:00Z",
+        "end_timestamp": "2025-06-20T12:07:40Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Between 1 and 3 am",
+      "inputs": {
+        "prompt": "Between 1 and 3 am",
+        "now": "2025-06-22T08:05:02.629754Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-22T01:00:00Z",
+        "end_timestamp": "2025-06-22T03:00:00Z",
+        "explanation": "Assumed the user meant between 1 and 3 AM today, converted to UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "grab me 12 hours from yesterday 2pm",
+      "inputs": {
+        "prompt": "grab me 12 hours from yesterday 2pm",
+        "now": "2025-06-23T07:59:07.933531Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-22T14:00:00Z",
+        "end_timestamp": "2025-06-23T02:00:00Z",
+        "explanation": "Selected a 12-hour period starting from 2 PM yesterday UTC."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "grab me 12 hours from yesterday 2pm CET",
+      "inputs": {
+        "prompt": "grab me 12 hours from yesterday 2pm CET",
+        "now": "2025-06-23T07:59:26.554771Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2023-06-22T14:00:00+02:00",
+        "end_timestamp": "2023-06-23T02:00:00+02:00",
+        "explanation": "Includes the 12 hours starting from 2 PM CET yesterday."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "go backwards 12 hours from yesterday 2pm CET",
+      "inputs": {
+        "prompt": "go backwards 12 hours from yesterday 2pm CET",
+        "now": "2025-06-23T07:59:52.608633Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-21T14:00:00+02:00",
+        "end_timestamp": "2025-06-21T02:00:00+02:00",
+        "explanation": "Selected the 12 hours before 2pm CET yesterday (Sunday, June 22, 2025)."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "today all day",
+      "inputs": {
+        "prompt": "today all day",
+        "now": "2025-06-24T05:10:27.972906Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-24T00:00:00Z",
+        "end_timestamp": "2025-06-24T05:10:28Z",
+        "explanation": "Includes all of today's data from midnight to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Jun 22 between 8 am and 10 am",
+      "inputs": {
+        "prompt": "Jun 22 between 8 am and 10 am",
+        "now": "2025-06-24T07:59:18.378442Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-22T08:00:00Z",
+        "end_timestamp": "2025-06-22T10:00:00Z",
+        "explanation": "Assuming the most recent June 22, which is within the last 24 hours, under the assumption that the user wants recent data."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 4 days",
+      "inputs": {
+        "prompt": "last 4 days",
+        "now": "2025-06-24T15:13:42.757996Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-20T15:13:42Z",
+        "end_timestamp": "2025-06-24T15:13:42Z",
+        "explanation": "Includes the last 4 days up to the current time."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "last 2 minutes",
+      "inputs": {
+        "prompt": "last 2 minutes",
+        "now": "2025-06-24T15:43:08.960154Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-24T15:41:08Z",
+        "end_timestamp": "2025-06-24T15:43:08Z",
+        "explanation": ""
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "all time",
+      "inputs": {
+        "prompt": "all time",
+        "now": "2025-06-24T18:50:30.162306Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2024-05-25T18:50:30Z",
+        "end_timestamp": "2025-06-24T18:50:30Z",
+        "explanation": "Only includes the last 30 days."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "Jun 26 13:15:23 PM",
+      "inputs": {
+        "prompt": "Jun 26 13:15:23 PM",
+        "now": "2025-06-26T19:43:46.8541Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-26T13:10:23Z",
+        "end_timestamp": "2025-06-26T13:20:23Z",
+        "explanation": "Selected a 10-minute window around the specified time. Assuming UTC as no timezone was provided."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    },
+    {
+      "name": "yesterday around 2pm",
+      "inputs": {
+        "prompt": "yesterday around 2pm",
+        "now": "2025-06-27T08:25:03.095395Z"
+      },
+      "expected_output": {
+        "start_timestamp": "2025-06-26T13:55:00Z",
+        "end_timestamp": "2025-06-26T14:05:00Z",
+        "explanation": "Selected a 10-minute window around 2 PM UTC yesterday."
+      },
+      "evaluators": [
+        {
+          "IsInstance": "TimeRangeBuilderSuccess"
+        }
+      ]
+    }
+  ]
+}
