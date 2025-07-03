@@ -41,7 +41,7 @@ async def self_improving_model() -> AsyncIterator[SelfImprovingAgentModel]:
     await m.wait_for_coach()
 
 
-@time_range_agent.instructions
+@time_range_agent.tool
 def inject_current_time(ctx: RunContext[TimeRangeDeps]) -> str:
     """Add the user's current time and timezone in the format 'Friday, November 22, 2024 11:15:14 PST' to context."""
     return f"The user's current time is {ctx.deps.now:%A, %B %d, %Y %H:%M:%S %Z}."
