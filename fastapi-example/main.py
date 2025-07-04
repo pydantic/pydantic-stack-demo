@@ -21,11 +21,12 @@ async def lifespan(_app: FastAPI):
     global http_client, openai_client
     async with AsyncClient() as _http_client:
         http_client = _http_client
-        logfire.instrument_httpx(http_client, headers=True)
+        logfire.instrument_httpx(http_client, capture_headers=True)
         yield
 
 
 app = FastAPI(lifespan=lifespan)
+logfire.instrument_fastapi(app, capture_headers=True)
 this_dir = Path(__file__).parent
 image_dir = Path(__file__).parent / 'images'
 image_dir.mkdir(exist_ok=True)
@@ -33,12 +34,13 @@ app.mount('/static', StaticFiles(directory=image_dir), name='static')
 
 
 @app.get('/')
+@app.get('/display/{image:path}')
 async def main() -> FileResponse:
-    return FileResponse(this_dir / 'index.html')
+    return FileResponse(this_dir / 'page.html')
 
 
 class GenerateResponse(BaseModel):
-    image_url: str = Field(serialization_alias='imageUrl')
+    next_url: str = Field(serialization_alias='nextUrl')
 
 
 @app.post('/generate')
@@ -53,10 +55,10 @@ async def generate_image(prompt: str) -> GenerateResponse:
     r.raise_for_status()
     path = f'{uuid4().hex}.jpg'
     (image_dir / path).write_bytes(r.content)
-    return GenerateResponse(image_url=f'/static/{path}')
+    return GenerateResponse(next_url=f'/display/{path}')
 
 
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(app, port=8000)
+    uvicorn.run(app)

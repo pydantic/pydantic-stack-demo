@@ -13,7 +13,7 @@
         font-family: "IBM Plex Sans", sans-serif;
         max-width: 800px;
         margin: 0 auto;
-        padding: 80px 20px 20px;
+        padding: 50px 20px 20px;
         background-color: #f5f5f5;
       }
 
@@ -34,6 +34,7 @@
         width: 100%;
         padding: 10px;
         font-size: 16px;
+        font-family: inherit;
         border: 2px solid #ddd;
         border-radius: 8px;
         box-sizing: border-box;
@@ -45,11 +46,17 @@
         border-color: #4caf50;
       }
 
+      a {
+        text-decoration: none;
+      }
+
+      a,
       button {
         background-color: #4caf50;
         color: white;
         padding: 15px 30px;
         font-size: 16px;
+        font-family: inherit;
         border: none;
         border-radius: 8px;
         cursor: pointer;
@@ -84,6 +91,7 @@
 
       .generated-image {
         max-width: 100%;
+        max-height: 600px;
         height: auto;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -134,7 +142,7 @@
           alt="Generated image"
         />
         <br /><br />
-        <button class="clear-btn" onclick="clearImage()">Clear</button>
+        <a href="/" class="clear-btn" onclick="clearImage()">Clear</a>
       </div>
     </div>
 
@@ -176,9 +184,9 @@
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
-          const { imageUrl } = await response.json();
+          const { nextUrl } = await response.json();
 
-          showImage(imageUrl);
+          window.location.href = nextUrl;
         } catch (error) {
           console.error("Error generating image:", error);
           showError("Failed to generate image. Please try again.");
@@ -207,15 +215,13 @@
         promptSection.classList.remove("hidden");
       }
 
-      function clearImage() {
-        imageSection.classList.add("hidden");
-        errorSection.classList.add("hidden");
-        promptSection.classList.remove("hidden");
-        promptInput.value = "";
-        promptInput.focus();
+      const path = window.location.pathname;
+      const imageMatch = path.match(/^\/display\/(.+\.jpg)$/);
 
-        // Clean up the blob URL
-        URL.revokeObjectURL(generatedImage.src);
+      if (imageMatch) {
+        const imageUrl = `/static/${imageMatch[1]}`;
+        showLoading();
+        showImage(imageUrl);
       }
     </script>
   </body>
