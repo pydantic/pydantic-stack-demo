@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/codespell-project/codespell
+    # Configuration for codespell is in pyproject.toml
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        additional_dependencies:
+          - tomli
+
+  - repo: local
+    hooks:
+      - id: format
+        name: Format Python
+        entry: uv
+        args: [run, ruff, format]
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: lint
+        name: lint Python
+        entry: uv
+        args: [run, ruff, check, --fix]
+        language: system
+        types: [python]
+        pass_filenames: false
