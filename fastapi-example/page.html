@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Generator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "IBM Plex Sans", sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 50px 20px 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 30px;
+      }
+
+      .prompt-section {
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        font-family: inherit;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #4caf50;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      a,
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 15px 30px;
+        font-size: 16px;
+        font-family: inherit;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+
+      .clear-btn {
+        background-color: #f44336;
+      }
+
+      .clear-btn:hover {
+        background-color: #da190b;
+      }
+
+      .loading {
+        margin: 20px 0;
+        color: #666;
+      }
+
+      .image-container {
+        margin-top: 20px;
+      }
+
+      .generated-image {
+        max-width: 100%;
+        max-height: 600px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .error {
+        color: #f44336;
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #ffebee;
+        border-radius: 5px;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Image Generator</h1>
+
+      <div id="promptSection" class="prompt-section">
+        <input
+          type="text"
+          id="promptInput"
+          placeholder="Painting of an iphone in the style of Titian..."
+          maxlength="500"
+        />
+        <br />
+        <button id="generateBtn" onclick="generateImage()">
+          Generate Image
+        </button>
+      </div>
+
+      <div id="loadingSection" class="loading hidden">
+        <p>Generating your image...</p>
+      </div>
+
+      <div id="errorSection" class="error hidden">
+        <p id="errorMessage"></p>
+      </div>
+
+      <div id="imageSection" class="image-container hidden">
+        <img
+          id="generatedImage"
+          class="generated-image"
+          alt="Generated image"
+        />
+        <br /><br />
+        <a href="/" class="clear-btn" onclick="clearImage()">Clear</a>
+      </div>
+    </div>
+
+    <script>
+      const promptInput = document.getElementById("promptInput");
+      const generateBtn = document.getElementById("generateBtn");
+      const promptSection = document.getElementById("promptSection");
+      const loadingSection = document.getElementById("loadingSection");
+      const errorSection = document.getElementById("errorSection");
+      const imageSection = document.getElementById("imageSection");
+      const generatedImage = document.getElementById("generatedImage");
+      const errorMessage = document.getElementById("errorMessage");
+
+      promptInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          generateImage();
+        }
+      });
+
+      async function generateImage() {
+        const prompt = promptInput.value.trim();
+
+        if (!prompt) {
+          showError("Please enter a description for the image.");
+          return;
+        }
+
+        showLoading();
+
+        const params = new URLSearchParams();
+        params.append("prompt", prompt);
+
+        try {
+          const response = await fetch(`/generate?${params.toString()}`, {
+            method: "POST",
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const { nextUrl } = await response.json();
+
+          window.location.href = nextUrl;
+        } catch (error) {
+          console.error("Error generating image:", error);
+          showError("Failed to generate image. Please try again.");
+        }
+      }
+
+      function showLoading() {
+        promptSection.classList.add("hidden");
+        errorSection.classList.add("hidden");
+        imageSection.classList.add("hidden");
+        loadingSection.classList.remove("hidden");
+      }
+
+      function showImage(imageUrl) {
+        loadingSection.classList.add("hidden");
+        errorSection.classList.add("hidden");
+        generatedImage.src = imageUrl;
+        imageSection.classList.remove("hidden");
+      }
+
+      function showError(message) {
+        loadingSection.classList.add("hidden");
+        imageSection.classList.add("hidden");
+        errorMessage.textContent = message;
+        errorSection.classList.remove("hidden");
+        promptSection.classList.remove("hidden");
+      }
+
+      const path = window.location.pathname;
+      const imageMatch = path.match(/^\/display\/(.+\.jpg)$/);
+
+      if (imageMatch) {
+        const imageUrl = `/static/${imageMatch[1]}`;
+        showLoading();
+        showImage(imageUrl);
+      }
+    </script>
+  </body>
+</html>
