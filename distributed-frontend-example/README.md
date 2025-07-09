@@ -9,9 +9,10 @@ The React application (`frontend/`) is instrumented using the
 `@pydantic/logfire-browser` NPM package. Details about the instrumentation
 specifics can be found in the `ClientInstrumentationProvider.tsx` file.
 
-The browser instrumentation does not send traces to Logfire directly, but
+For security/performance reasons, the browser instrumentation does not send traces to Logfire directly, but
 instead sends them to the backend. The backend then proxies the traces to
-Logfire - the `/client-traces` FastAPI endpoint in `main.py`.
+Logfire - the `/client-traces` FastAPI endpoint in `main.py`. In that way, the Logfire write token is not exposed in the client-side bundle. 
+In production, you should ensure that the proxy endpoint is Auth protected and only accessible to your frontend.
 
 # Running the demo
 

@@ -12,8 +12,9 @@ from httpx import AsyncClient
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
-logfire.configure(service_name='fastapi-example', distributed_tracing=True)
+logfire.configure(service_name='backend', distributed_tracing=True)
 
+# Enable this if you experience issues with the proxy endpoint and want to capture all outgoing HTTP requests
 # logfire.instrument_httpx(capture_all=True)
 http_client: AsyncClient
 openai_client = AsyncOpenAI()
@@ -24,6 +25,7 @@ logfire_base_url = os.getenv('LOGFIRE_BASE_URL')
 
 assert logfire_token is not None, 'LOGFIRE_TOKEN is not set'
 assert logfire_base_url is not None, 'LOGFIRE_BASE_URL is not set'
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -54,8 +56,10 @@ image_dir.mkdir(exist_ok=True)
 
 app.mount('/static', StaticFiles(directory=image_dir), name='static')
 
+
 class GenerateResponse(BaseModel):
     next_url: str = Field(serialization_alias='nextUrl')
+
 
 @app.post('/generate')
 async def generate_image(prompt: str) -> GenerateResponse:
@@ -71,13 +75,17 @@ async def generate_image(prompt: str) -> GenerateResponse:
     (image_dir / path).write_bytes(r.content)
     return GenerateResponse(next_url=f'/static/{path}')
 
+
 # Proxy to Logfire for client traces from the browser
+# We need options because browsers will preflight requests to this endpoint - https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS#preflighted_requests_in_cors
 @app.api_route('/client-traces', methods=['POST', 'OPTIONS'])
 async def client_traces(request: Request):
     async with httpx.AsyncClient() as client:
-
         response = await client.request(
-            method=request.method, url=f'{logfire_base_url}v1/traces', headers=dict(Authorization=logfire_token), json=await request.json()
+            method=request.method,
+            url=f'{logfire_base_url}v1/traces',
+            headers=dict(Authorization=logfire_token),
+            json=await request.json(),
         )
 
     return {
