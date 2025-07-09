@@ -77,8 +77,7 @@ async def generate_image(prompt: str) -> GenerateResponse:
 
 
 # Proxy to Logfire for client traces from the browser
-# We need options because browsers will preflight requests to this endpoint - https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS#preflighted_requests_in_cors
-@app.api_route('/client-traces', methods=['POST', 'OPTIONS'])
+@app.post('/client-traces')
 async def client_traces(request: Request):
     async with httpx.AsyncClient() as client:
         response = await client.request(
