@@ -9,7 +9,7 @@ dependencies = [
     "devtools>=0.12.2",
     "fastapi>=0.115.14",
     "logfire[asyncpg,fastapi,httpx]>=3.21.1",
-    "pydantic-ai>=0.3.4",
+    "pydantic-ai>=0.3.6",
 ]
 
 [dependency-groups]
