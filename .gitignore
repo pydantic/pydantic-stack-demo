@@ -11,3 +11,6 @@ wheels/
 *.svg
 
 /fastapi-example/images/
+
+node_modules/
+/distributed-frontend-example/images/
