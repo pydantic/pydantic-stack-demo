@@ -44,6 +44,7 @@ app.add_middleware(
     allow_origins=['http://localhost:5173'],  # Our frontend in dev mode
     allow_credentials=True,
     allow_methods=['*'],  # Allow all methods
+    # Important: if you don't want to allow all headers and you're using distributed tracing, you need to explicitly list the 'traceparent' header
     allow_headers=['*'],  # Allow all headers
 )
 
