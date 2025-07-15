@@ -1,37 +1,27 @@
-from contextlib import asynccontextmanager
-from typing import cast
+from datetime import datetime, timezone
 
 import logfire
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
 
-from .agent import infer_time_range, self_improving_model
+from .agent import get_coach, infer_time_range
 from .models import TimeRangeInputs, TimeRangeResponse
-from .self_improving_agent import SelfImprovingAgentModel
-from .self_improving_agent_storage import LocalStorage
+from .self_improving_agent import ModelContextPatch
 
 logfire.configure(environment='dev')
 
 logfire.instrument_pydantic_ai()
 logfire.instrument_httpx()
+coach = get_coach()
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with self_improving_model() as (storage, model):
-        app.state.storage = storage
-        app.state.model = model
-        yield
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 logfire.instrument_fastapi(app)
 
 
 @app.post('/api/timerange')
-async def convert_time_range(request: Request, time_range_inputs: TimeRangeInputs) -> TimeRangeResponse:
-    model = cast(SelfImprovingAgentModel, request.app.state.model)
-    return await infer_time_range(time_range_inputs, model=model)
+async def convert_time_range(time_range_inputs: TimeRangeInputs) -> TimeRangeResponse:
+    return await infer_time_range(time_range_inputs)
 
 
 class Field(BaseModel):
@@ -40,10 +30,28 @@ class Field(BaseModel):
 
 
 @app.get('/api/context')
-async def get_agent_context(request: Request) -> list[Field]:
-    storage = cast(LocalStorage, request.app.state.storage)
-    patch = await storage.get_patch('time_range_agent')
-    if not patch:
-        return []
-    else:
-        return [Field(id=key, text=value) for key, value in patch.context_patch.items()]
+def get_agent_context() -> list[Field]:
+    coach_fields = coach.get_fields() or []
+    fields = [Field(id=f.key, text=f.current_prompt or '') for f in coach_fields]
+
+    if patch := coach.get_patch():
+        for field in fields:
+            if new_text := patch.context_patch.get(field.id):
+                field.text = new_text
+
+    return fields
+
+
+class PostFields(BaseModel):
+    fields: list[Field]
+
+
+@app.post('/api/context')
+def post_agent_context(m: PostFields):
+    context_patch = {f.id: f.text for f in m.fields if f.text}
+    coach.update_patch(ModelContextPatch(context_patch=context_patch, timestamp=datetime.now(tz=timezone.utc)))
+
+
+@app.post('/api/context/update')
+async def post_update_agent_context():
+    await coach.run()

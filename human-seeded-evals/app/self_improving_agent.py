@@ -1,26 +1,12 @@
 from __future__ import annotations as _annotations
 
-import asyncio
 import csv
 import io
-from abc import ABC, abstractmethod
-from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import (
-    Annotated,
-    Any,
-    AsyncContextManager,
-    Iterable,
-    Iterator,
-    Literal,
-    Protocol,
-    TypeAlias,
-    TypedDict,
-    TypeGuard,
-    cast,
-)
+from pathlib import Path
+from typing import Annotated, Any, Iterable, Literal, Protocol, TypeAlias, TypedDict, TypeGuard, cast
 
 from annotated_types import Ge, Le
 from logfire import Logfire
@@ -37,31 +23,20 @@ logfire = Logfire(otel_scope='self-improving-agent')
 FieldsPatch = dict[str, str]
 
 
+@dataclass
+class FieldDetails:
+    key: str
+    description: str
+    current_prompt: str | None = None
+
+
+fields_path = Path('agent_context_fields.json')
+fields_schema = TypeAdapter(list[FieldDetails])
+
+
 class ModelContextPatch(BaseModel):
     context_patch: FieldsPatch
     timestamp: AwareDatetime
-
-
-class SelfImprovingAgentStorage(ABC):
-    @abstractmethod
-    async def get_patch(self, agent_name: str) -> ModelContextPatch | None:
-        """Get the patch for the given agent."""
-
-    @abstractmethod
-    async def set_patch(self, agent_name: str, patch: ModelContextPatch, expires: timedelta) -> None:
-        """Set the patch for the given agent."""
-
-    @abstractmethod
-    def lock(self, agent_name: str) -> AsyncContextManager[bool]:
-        """Try to obtain a lock for a coach run.
-
-        This doesn't have to be perfect, but being relatively reliable will reduce the changes of duplicate
-        concurrent agent runs.
-
-        Returns:
-            Async context manager that yields `True` if the lock was obtained, `False` otherwise and
-            releases the lock when exited.
-        """
 
 
 class AbstractCoachOutput(Protocol):
@@ -70,55 +45,12 @@ class AbstractCoachOutput(Protocol):
     overall_context_score: int
 
 
+patch_path = Path('agent_context_patches.json')
+
+
 @dataclass(init=False)
 class SelfImprovingAgentModel(WrapperModel):
     wrapped_model: Model
-    storage: SelfImprovingAgentStorage
-    logfire_read_token: str
-    agent_name: str
-    """Used to filter to data about runs of this agent"""
-    logfire_environment: str | None
-    """Name of the environment in logfire where the main agent is running, improves query performance"""
-    logfire_filter: str | None
-    """Additional logfire filter when looking for agent run traces to improve performance"""
-
-    minimum_run_interval: timedelta
-    """Minimum interval between coach runs"""
-
-    minimum_new_runs: int = 1
-    """Minimum number of new runs required to trigger a coach run"""
-
-    force_blocking: bool = False
-    """Whether to block the main agent until the coach has completed its run, and forces a run of the coach"""
-
-    coach_model: Model
-    """Model used for the coach agent"""
-
-    _patch: ModelContextPatch | None = None
-    _coach_task: asyncio.Task[None] | None = None
-    _coach_agent: Agent[None, AbstractCoachOutput] | None = None
-
-    def __init__(
-        self,
-        wrapped_model: Model | KnownModelName,
-        storage: SelfImprovingAgentStorage,
-        logfire_read_token: str,
-        agent_name: str,
-        logfire_environment: str | None = None,
-        logfire_filter: str | None = None,
-        minimum_run_interval: timedelta = timedelta(minutes=30),
-        minimum_new_runs: int = 1,
-        coach_model: Model | KnownModelName = 'anthropic:claude-opus-4-0',
-    ):
-        super().__init__(wrapped_model)
-        self.storage = storage
-        self.logfire_read_token = logfire_read_token
-        self.agent_name = agent_name
-        self.logfire_environment = logfire_environment
-        self.logfire_filter = logfire_filter
-        self.minimum_run_interval = minimum_run_interval
-        self.minimum_new_runs = minimum_new_runs
-        self.coach_model = infer_model(coach_model)
 
     async def request(
         self,
@@ -126,12 +58,10 @@ class SelfImprovingAgentModel(WrapperModel):
         model_settings: ModelSettings | None,
         model_request_parameters: ModelRequestParameters,
     ) -> ModelResponse:
-        if self.force_blocking:
-            await self._blocking_coach(messages, model_settings, model_request_parameters)
-        else:
-            await self._deferred_coach(messages, model_settings, model_request_parameters)
+        fields = list(context_patch_fields(messages, model_request_parameters))
+        fields_path.write_bytes(fields_schema.dump_json(fields, indent=2))
 
-        if patch := self._patch:
+        if patch := Coach.get_patch():
             messages, model_request_parameters = apply_patch(messages, model_request_parameters, patch.context_patch)
 
         return await super().request(messages, model_settings, model_request_parameters)
@@ -146,118 +76,62 @@ class SelfImprovingAgentModel(WrapperModel):
         """The system prompt."""
         return self.inner_model.system
 
-    @contextmanager
-    def blocking_context(self) -> Iterator[None]:
-        force_blocking = self.force_blocking
-        self.force_blocking = True
+
+@dataclass
+class Coach:
+    agent_name: str
+    logfire_read_token: str
+    logfire_environment: str | None = None
+    """Name of the environment in logfire where the main agent is running, improves query performance"""
+    logfire_filter: str | None = None
+    """Additional logfire filter when looking for agent run traces to improve performance"""
+
+    coach_model: Model | KnownModelName = 'anthropic:claude-opus-4-0'
+    """Model used for the coach agent"""
+
+    async def run(self):
+        fields = self.get_fields()
+        last_path = self.get_patch()
+        runs, last_run = await self._get_runs(last_path and last_path.timestamp)
+
+        prompt_data: dict[str, Any] = {
+            'default_model_context': {f.key: f.current_prompt for f in fields if f.current_prompt}
+        }
+        if last_path:
+            prompt_data['previous_context_patch'] = last_path.context_patch
+        if runs:
+            prompt_data['recent_agent_runs'] = runs
+        prompt = format_as_xml(prompt_data, include_root_tag=False)
+        coach_agent = self._get_coach_agent(fields)
+        r = await coach_agent.run(prompt)
+        run_count = len(runs) if runs is not None else None
+        if r.output.overall_context_score < 5:
+            logfire.warning(
+                'Coach run with quality warning, score={output.overall_context_score} {run_count=}',
+                output=r.output,
+                run_count=run_count,
+            )
+        else:
+            logfire.info(
+                'Coach run with quality ok, score={output.overall_context_score} {run_count=}',
+                output=r.output,
+                run_count=run_count,
+            )
+        patch = ModelContextPatch(context_patch=r.output.context_patch, timestamp=last_run)
+        self.update_patch(patch)
+
+    def get_fields(self) -> list[FieldDetails]:
+        return fields_schema.validate_json(fields_path.read_bytes())
+
+    @staticmethod
+    def get_patch() -> ModelContextPatch | None:
         try:
-            yield
-        finally:
-            self.force_blocking = force_blocking
+            return ModelContextPatch.model_validate_json(patch_path.read_bytes())
+        except FileNotFoundError:
+            return None
 
-    async def wait_for_coach(self):
-        if self._coach_task is not None:
-            logfire.info('waiting for existing coach run to finish')
-            await self._coach_task
-            self._coach_task = None
-
-    async def _blocking_coach(
-        self,
-        messages: list[ModelMessage],
-        _model_settings: ModelSettings | None,
-        model_request_parameters: ModelRequestParameters,
-    ):
-        if self._coach_task is not None:
-            logfire.info('waiting for existing coach run to finish')
-            await self._coach_task
-            self._coach_task = None
-
-        if self._patch is None:
-            self._patch = await self.storage.get_patch(self.agent_name)
-
-        fields = list(context_patch_fields(messages, model_request_parameters))
-        await self._run_coach(fields, force=True)
-
-    async def _deferred_coach(
-        self,
-        messages: list[ModelMessage],
-        _model_settings: ModelSettings | None,
-        model_request_parameters: ModelRequestParameters,
-    ):
-        # check if the coach task is done, and await it if so (to raise any errors), then set it to None
-        if self._coach_task is not None and self._coach_task.done():
-            self._coach_task = None
-
-        if self._coach_task is not None:
-            # coach is already running
-            return
-
-        if self._patch is None:
-            self._patch = await self.storage.get_patch(self.agent_name)
-
-        if (
-            self._patch is not None
-            and datetime.now(tz=timezone.utc) - self._patch.timestamp <= self.minimum_run_interval
-        ):
-            logfire.info('Got patch, not yet expired {patch_timestamp=}', patch_timestamp=self._patch.timestamp)
-            return
-
-        # should we wait to build fields until we've checked the coach is going to run?
-        # in theory messages and model_request_parameters might be altered while the task is running
-        fields = list(context_patch_fields(messages, model_request_parameters))
-        self._coach_task = asyncio.create_task(self._run_coach_wrapper(fields))
-
-    async def _run_coach_wrapper(self, fields: list[FieldDetails]):
-        try:
-            await self._run_coach(fields)
-        except Exception:
-            logfire.exception('Error running coach')
-
-    async def _run_coach(self, fields: list[FieldDetails], *, force: bool = False):
-        if (
-            not force
-            and self._patch is not None
-            and datetime.now(tz=timezone.utc) - self._patch.timestamp <= self.minimum_run_interval
-        ):
-            logfire.info('Got patch, not yet expired {patch_timestamp=}', patch_timestamp=self._patch.timestamp)
-            return
-
-        async with self.storage.lock(self.agent_name) as got_lock:
-            if not got_lock:
-                logfire.info('another agent is already running the coach')
-                return
-
-            runs, last_run = await self._get_runs(self._patch and self._patch.timestamp)
-            if not force and runs is None and self._patch is not None:
-                logfire.info('no new runs and we have a patch, so we not running the coach')
-                return
-
-            coach_agent = self._get_coach_agent(fields)
-            prompt_data: dict[str, Any] = {
-                'default_model_context': {f.key: f.current_prompt for f in fields if f.current_prompt}
-            }
-            if self._patch:
-                prompt_data['previous_context_patch'] = self._patch.context_patch
-            if runs:
-                prompt_data['recent_agent_runs'] = runs
-            prompt = format_as_xml(prompt_data, include_root_tag=False)
-            coach_agent = self._get_coach_agent(fields)
-            r = await coach_agent.run(prompt)
-            run_count = len(runs) if runs is not None else None
-            if r.output.overall_context_score < 5:
-                logfire.warning(
-                    'Coach run with quality warning, score={output.overall_context_score} {run_count=}',
-                    output=r.output,
-                    run_count=run_count,
-                )
-            else:
-                logfire.info(
-                    'Coach run with quality ok, score={output.overall_context_score} {run_count=}',
-                    output=r.output,
-                    run_count=run_count,
-                )
-            self._patch = patch = ModelContextPatch(context_patch=r.output.context_patch, timestamp=last_run)
-            await self.storage.set_patch(self.agent_name, patch, timedelta(days=1))
+    def update_patch(self, patch: ModelContextPatch) -> None:
+        patch_path.write_text(patch.model_dump_json(indent=2))
 
     async def _get_runs(self, min_timestamp: datetime | None) -> tuple[list[AgentRunSummary] | None, datetime]:
         async with AsyncLogfireQueryClient(self.logfire_read_token) as client:
@@ -267,11 +141,12 @@ class SelfImprovingAgentModel(WrapperModel):
             if self.logfire_filter:
                 runs_where.append(self.logfire_filter)
             sql = runs_query.format(where=' AND '.join(runs_where))
+            min_timestamp = datetime.now(tz=timezone.utc) - timedelta(hours=2)
             r = await client.query_json_rows(sql=sql, min_timestamp=min_timestamp)
             runs_rows = r['rows']
             count = len(runs_rows)
-            if count < self.minimum_new_runs:
-                logfire.info('Found {run_count} runs, not enough to run coach', run_count=count)
+            if not count:
+                logfire.info('Found {run_count} runs', run_count=count)
                 return None, datetime.now(tz=timezone.utc) - timedelta(seconds=30)
 
             created_ats = datetime_list_schema.validate_python([row['created_at'] for row in runs_rows])
@@ -300,9 +175,6 @@ class SelfImprovingAgentModel(WrapperModel):
             return runs, last_run
 
     def _get_coach_agent(self, fields: list[FieldDetails]) -> Agent[None, AbstractCoachOutput]:
-        if self._coach_agent:
-            return self._coach_agent
-
         fields_dict = {f.key: Annotated[str, Field(description=f.description)] for f in fields}
         ModelRequestFields = TypedDict(
             'ModelRequestFields',
@@ -321,9 +193,10 @@ class SelfImprovingAgentModel(WrapperModel):
             Any value below 5 will trigger a warning to the agent maintainers.
             """
 
+        coach_model = infer_model(self.coach_model)
         self._coach_agent = agent = cast(
             Agent[None, AbstractCoachOutput],
-            Agent(self.coach_model, output_type=CoachOutput, instructions=coach_instrunctions),
+            Agent(coach_model, output_type=CoachOutput, instructions=coach_instrunctions),
         )
         return agent
 
@@ -384,13 +257,6 @@ and tool descriptions, please suggest improvements the developer should make.
 YOU SHOULD ONLY INCLUDE SUGGESTIONS IF THERE ARE SHORTCOMINGS IN THE CONTEXT PROVIDED TO THE MODEL
 THAT CANNOT BE SOLVED BY ADJUSTING THE INSTRUCTIONS AND TOOL DESCRIPTIONS.
 """
-
-
-@dataclass
-class FieldDetails:
-    key: str
-    description: str
-    current_prompt: str | None = None
 
 
 def context_patch_fields(

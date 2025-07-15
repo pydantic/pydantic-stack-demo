@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { getFields, type Field } from '../api';
+import { getFields, submitContext, updateContext, type Field } from '../api';
 
 export function PromptView() {
   const [fields, setFields] = useState<Field[]>([]);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [improving, setImproving] = useState(false);
+
+  const loadFields = async () => {
+    setLoading(true);
+    try {
+      const fieldsData = await getFields();
+      setFields(fieldsData);
+      const initialData: Record<string, string> = {};
+      fieldsData.forEach(field => {
+        initialData[field.id] = field.text;
+      });
+      setFormData(initialData);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadFields() {
-      try {
-        const fieldsData = await getFields();
-        setFields(fieldsData);
-        const initialData: Record<string, string> = {};
-        fieldsData.forEach(field => {
-          initialData[field.id] = field.text;
-        });
-        setFormData(initialData);
-      } finally {
-        setLoading(false);
-      }
-    }
+    document.title = 'Agent Context Form';
     loadFields();
   }, []);
 
@@ -30,10 +35,37 @@ export function PromptView() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Handle form submission here
+    setSubmitting(true);
+
+    try {
+      await submitContext(formData);
+      console.log('Form submitted successfully');
+      // Reload data after successful submission
+      await loadFields();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Handle error (e.g., show error message)
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleImproveContext = async () => {
+    setImproving(true);
+
+    try {
+      await updateContext();
+      console.log('Context updated successfully');
+      // Reload data after successful update
+      await loadFields();
+    } catch (error) {
+      console.error('Error updating context:', error);
+      // Handle error (e.g., show error message)
+    } finally {
+      setImproving(false);
+    }
   };
 
   const handleBack = () => {
@@ -62,7 +94,25 @@ export function PromptView() {
             <span>Back</span>
           </button>
           <h1 className="text-3xl font-bold text-white">Agent Context Form</h1>
-          <div className="w-20"></div>
+          <button
+            onClick={handleImproveContext}
+            disabled={improving || loading}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          >
+            {improving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Improving...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span>Improve Agent Context</span>
+              </>
+            )}
+          </button>
         </div>
 
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
@@ -84,7 +134,6 @@ export function PromptView() {
                     id={field.id}
                     value={formData[field.id] || ''}
                     onChange={(e) => handleInputChange(field.id, e.target.value)}
-                    placeholder={`Enter ${field.id.toLowerCase()}`}
                     rows={4}
                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
                   />
@@ -94,9 +143,17 @@ export function PromptView() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-medium transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  disabled={submitting}
+                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-medium transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed"
                 >
-                  Submit
+                  {submitting ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Submitting...
+                    </div>
+                  ) : (
+                    'Submit'
+                  )}
                 </button>
               </div>
             </form>

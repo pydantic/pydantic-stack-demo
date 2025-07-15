@@ -1,17 +1,14 @@
 from __future__ import annotations as _annotations
 
 import os
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import datetime
-from typing import AsyncIterator
 
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.models import Model
 
 from .models import TimeRangeInputs, TimeRangeResponse
-from .self_improving_agent import SelfImprovingAgentModel
-from .self_improving_agent_storage import LocalStorage
+from .self_improving_agent import Coach, SelfImprovingAgentModel
 
 
 @dataclass
@@ -29,18 +26,9 @@ time_range_agent = Agent[TimeRangeDeps, TimeRangeResponse](
 )
 
 
-@asynccontextmanager
-async def self_improving_model() -> AsyncIterator[tuple[LocalStorage, SelfImprovingAgentModel]]:
+def get_coach() -> Coach:
     logfire_read_token = os.environ['LOGFIRE_READ_TOKEN']
-    # cloudkv_read_token, cloudkv_write_token = os.environ['CLOUDKV_TOKEN'].split('.')
-    # async with AsyncCloudKV(cloudkv_read_token, cloudkv_write_token) as cloudkv:
-    #     storage = CloudKVStorage(cloudkv)
-    storage = LocalStorage()
-    m = SelfImprovingAgentModel('anthropic:claude-sonnet-4-0', storage, logfire_read_token, 'time_range_agent')
-
-    yield storage, m
-
-    await m.wait_for_coach()
+    return Coach('time_range_agent', logfire_read_token)
 
 
 @time_range_agent.tool
@@ -49,7 +37,8 @@ def inject_current_time(ctx: RunContext[TimeRangeDeps]) -> str:
     return f"The user's current time is {ctx.deps.now:%A, %B %d, %Y %H:%M:%S %Z}."
 
 
-async def infer_time_range(inputs: TimeRangeInputs, *, model: Model | None = None) -> TimeRangeResponse:
+async def infer_time_range(inputs: TimeRangeInputs) -> TimeRangeResponse:
     """Infer a time range from a user prompt."""
+    model = SelfImprovingAgentModel('anthropic:claude-sonnet-4-0')
     result = await time_range_agent.run(inputs.prompt, deps=TimeRangeDeps(now=inputs.now), model=model)
     return result.output
