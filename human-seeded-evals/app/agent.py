@@ -30,14 +30,16 @@ time_range_agent = Agent[TimeRangeDeps, TimeRangeResponse](
 
 
 @asynccontextmanager
-async def self_improving_model() -> AsyncIterator[SelfImprovingAgentModel]:
+async def self_improving_model() -> AsyncIterator[tuple[LocalStorage, SelfImprovingAgentModel]]:
     logfire_read_token = os.environ['LOGFIRE_READ_TOKEN']
     # cloudkv_read_token, cloudkv_write_token = os.environ['CLOUDKV_TOKEN'].split('.')
     # async with AsyncCloudKV(cloudkv_read_token, cloudkv_write_token) as cloudkv:
     #     storage = CloudKVStorage(cloudkv)
     storage = LocalStorage()
     m = SelfImprovingAgentModel('anthropic:claude-sonnet-4-0', storage, logfire_read_token, 'time_range_agent')
-    yield m
+
+    yield storage, m
+
     await m.wait_for_coach()
 
 

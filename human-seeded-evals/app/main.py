@@ -3,10 +3,12 @@ from typing import cast
 
 import logfire
 from fastapi import FastAPI, Request
+from pydantic import BaseModel
 
 from .agent import infer_time_range, self_improving_model
 from .models import TimeRangeInputs, TimeRangeResponse
 from .self_improving_agent import SelfImprovingAgentModel
+from .self_improving_agent_storage import LocalStorage
 
 logfire.configure(environment='dev')
 
@@ -16,7 +18,8 @@ logfire.instrument_httpx()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with self_improving_model() as model:
+    async with self_improving_model() as (storage, model):
+        app.state.storage = storage
         app.state.model = model
         yield
 
@@ -29,3 +32,18 @@ logfire.instrument_fastapi(app)
 async def convert_time_range(request: Request, time_range_inputs: TimeRangeInputs) -> TimeRangeResponse:
     model = cast(SelfImprovingAgentModel, request.app.state.model)
     return await infer_time_range(time_range_inputs, model=model)
+
+
+class Field(BaseModel):
+    id: str
+    text: str
+
+
+@app.get('/api/context')
+async def get_agent_context(request: Request) -> list[Field]:
+    storage = cast(LocalStorage, request.app.state.storage)
+    patch = await storage.get_patch('time_range_agent')
+    if not patch:
+        return []
+    else:
+        return [Field(id=key, text=value) for key, value in patch.context_patch.items()]
