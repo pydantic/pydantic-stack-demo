@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from pydantic_ai import Agent, RunContext
-from pydantic_ai.models import Model
 
 from .models import TimeRangeInputs, TimeRangeResponse
 from .self_improving_agent import Coach, SelfImprovingAgentModel
@@ -16,12 +15,12 @@ class TimeRangeDeps:
     now: datetime
 
 
-instrunctions = "Convert the user's request into a structured time range."
+system_prompt = "Convert the user's request into a structured time range."
 time_range_agent = Agent[TimeRangeDeps, TimeRangeResponse](
     'anthropic:claude-sonnet-4-0',
     output_type=TimeRangeResponse,  # type: ignore  # we can't yet annotate something as receiving a TypeForm
     deps_type=TimeRangeDeps,
-    instructions=instrunctions,
+    system_prompt=system_prompt,
     retries=1,
 )
 

@@ -11,7 +11,7 @@ from .self_improving_agent import ModelContextPatch
 logfire.configure(environment='dev')
 
 logfire.instrument_pydantic_ai()
-logfire.instrument_httpx()
+logfire.instrument_httpx(capture_all=True)
 coach = get_coach()
 
 
