@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Input from './Input';
-import Card from './Card';
 import { convertTimeInterval } from '../api';
 import type { TimeInterval, ConversionError } from '../api';
 
@@ -46,7 +45,7 @@ export default function TimeConverter() {
         />
 
         {result && (
-          <Card>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
             {'error' in result ? (
               <div className="text-red-600">
                 <h3 className="font-medium mb-2">Error</h3>
@@ -80,7 +79,7 @@ export default function TimeConverter() {
                 </div>
               </div>
             )}
-          </Card>
+          </div>
         )}
       </div>
     </div>

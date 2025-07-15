@@ -2,12 +2,6 @@ version = 1
 revision = 2
 requires-python = ">=3.12"
 
-[manifest]
-members = [
-    "human-seeded-evals",
-    "pydantic-demo",
-]
-
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -179,6 +173,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/60/6c/8ca2efa64cf75a977a0d7fac081354553ebe483345c734fb6b6515d96bbc/click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202", size = 286342, upload-time = "2025-05-20T23:19:49.832Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/32/10bb5764d90a8eee674e9dc6f4db6a0ab47c8c4d0d83c27f7c39ac415a4d/click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b", size = 102215, upload-time = "2025-05-20T23:19:47.796Z" },
+]
+
+[[package]]
+name = "cloudkv"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "eval-type-backport" },
+    { name = "httpx" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ca/cc/7a77d60cb1fb2760ea4a35f71d7a3b15bef4a584803c6730f91b382f739b/cloudkv-0.3.0.tar.gz", hash = "sha256:9e3ca1d79a4fe0a04d8a17deeddce3fafed5646570ba097c86a64d118b568bc5", size = 131191, upload-time = "2025-06-08T09:31:57.437Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3c/2a/edb0131f554079d679b3cbac9aadd8895981d1b78f3ff6513c07b06ecccc/cloudkv-0.3.0-py3-none-any.whl", hash = "sha256:a1881107d1be92d0ce052eb85877c30e478a231a56d9825be348caa24cdc8447", size = 12993, upload-time = "2025-06-08T09:31:56.468Z" },
 ]
 
 [[package]]
@@ -474,27 +482,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a4/01/bfe0534a63ce7a2285e90dbb33e8a5b815ff096d8f7743b135c256916589/huggingface_hub-0.33.1.tar.gz", hash = "sha256:589b634f979da3ea4b8bdb3d79f97f547840dc83715918daf0b64209c0844c7b", size = 426728, upload-time = "2025-06-25T12:02:57.605Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d0/fb/5307bd3612eb0f0e62c3a916ae531d3a31e58fb5c82b58e3ebf7fd6f47a1/huggingface_hub-0.33.1-py3-none-any.whl", hash = "sha256:ec8d7444628210c0ba27e968e3c4c973032d44dcea59ca0d78ef3f612196f095", size = 515377, upload-time = "2025-06-25T12:02:55.611Z" },
-]
-
-[[package]]
-name = "human-seeded-evals"
-version = "0.1.0"
-source = { virtual = "human-seeded-evals" }
-
-[package.dev-dependencies]
-dev = [
-    { name = "pyright" },
-    { name = "ruff" },
-    { name = "watchfiles" },
-]
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "pyright", specifier = ">=1.1.402" },
-    { name = "ruff", specifier = ">=0.12.1" },
-    { name = "watchfiles", specifier = ">=1.1.0" },
 ]
 
 [[package]]
@@ -1066,6 +1053,7 @@ name = "pydantic-demo"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "cloudkv" },
     { name = "devtools" },
     { name = "fastapi" },
     { name = "httpx" },
@@ -1076,8 +1064,16 @@ dependencies = [
     { name = "uvicorn" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pyright" },
+    { name = "ruff" },
+    { name = "watchfiles" },
+]
+
 [package.metadata]
 requires-dist = [
+    { name = "cloudkv", specifier = ">=0.3.0" },
     { name = "devtools", specifier = ">=0.12.2" },
     { name = "fastapi", specifier = ">=0.115.14" },
     { name = "httpx", specifier = ">=0.28.1" },
@@ -1086,6 +1082,13 @@ requires-dist = [
     { name = "pydantic-ai", specifier = ">=0.3.4" },
     { name = "pydantic-evals", specifier = ">=0.3.4" },
     { name = "uvicorn", specifier = ">=0.34.3" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pyright", specifier = ">=1.1.402" },
+    { name = "ruff", specifier = ">=0.12.1" },
+    { name = "watchfiles", specifier = ">=1.1.0" },
 ]
 
 [[package]]
