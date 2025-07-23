@@ -11,7 +11,7 @@ specifics can be found in the `ClientInstrumentationProvider.tsx` file.
 
 For security/performance reasons, the browser instrumentation does not send traces to Logfire directly, but
 instead sends them to the backend. The backend then proxies the traces to
-Logfire - the `/client-traces` FastAPI endpoint in `main.py`. In that way, the Logfire write token is not exposed in the client-side bundle. 
+Logfire - the `/client-traces` FastAPI endpoint in `main.py`. In that way, the Logfire write token is not exposed in the client-side bundle.
 In production, you should ensure that the proxy endpoint is Auth protected and only accessible to your frontend.
 
 # Running the demo
