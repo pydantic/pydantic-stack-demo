@@ -9,8 +9,12 @@ dependencies = [
     "devtools>=0.12.2",
     "fastapi>=0.115.14",
     "logfire[asyncpg,fastapi,httpx]>=3.21.1",
-    "pydantic-ai>=0.3.6",
+    "pydantic-ai>=0.4.5",
+    "nltk>=3.9.1",
 ]
+
+[tool.uv.sources]
+pydantic-ai = { git = "https://github.com/pydantic/pydantic-ai.git", rev = "0f46928bd07bc1a9f89c1d72c76cd2a86d52d489" }
 
 [dependency-groups]
 dev = ["ruff>=0.12.2", "asyncpg-stubs>=0.30.2"]
