@@ -44,8 +44,10 @@ class AudioFile:
         return BinaryContent(data=path.read_bytes(), media_type='audio/mpeg')
 
 
+n_files = 10
 files_schema = TypeAdapter(list[AudioFile])
-files = files_schema.validate_json((this_dir / 'assets.json').read_bytes())
+files = files_schema.validate_json((this_dir / 'assets.json').read_bytes())[:n_files]
+# random.seed(42)
 random.shuffle(files)
 
 audio_agent = Agent(instructions='return the transcription only, no prefix or quotes')
