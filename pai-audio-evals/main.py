@@ -1,8 +1,13 @@
+import random
 from dataclasses import dataclass
 from pathlib import Path
 
+import logfire
 from pydantic import TypeAdapter
 from pydantic_ai import Agent, BinaryContent
+
+logfire.configure(service_name='pai-audio-evals')
+logfire.instrument_pydantic_ai()
 
 this_dir = Path(__file__).parent
 assets = this_dir / 'assets'
@@ -39,12 +44,13 @@ class AudioFile:
 
 files_schema = TypeAdapter(list[AudioFile])
 files = files_schema.validate_json((this_dir / 'assets.json').read_bytes())
+random.shuffle(files)
+audio_agent = Agent(instructions='return the transcription only, no prefix or quotes')
 
-for audio_file in files[:10]:
-    model_distances: list[tuple[str, int]] = []
-    for model in 'gpt-4o-audio-preview', 'gpt-4o-mini-audio-preview', 'google-vertex:gemini-2.0-flash':
-        agent = Agent(model='gpt-4o-audio-preview', instructions='return the transcription only, no prefix or quotes')
-        result = agent.run_sync(['transcribe', audio_file.binary_content()])
-        model_distances.append((model, levenshtein_distance(audio_file.text, result.output)))
-    print(audio_file.text)
-    print('  ', model_distances)
+for audio_file in files[:3]:
+    with logfire.span('Transcribing audio {audio_file.text!r}', audio_file=audio_file):
+        model_distances: list[tuple[str, int]] = []
+        for model in 'gpt-4o-audio-preview', 'gpt-4o-mini-audio-preview', 'google-gla:gemini-2.0-flash':
+            result = audio_agent.run_sync(['transcribe', audio_file.binary_content()], model=model)
+            model_distances.append((model, levenshtein_distance(audio_file.text, result.output)))
+        logfire.info(f'{model_distances}')
