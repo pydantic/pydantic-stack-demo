@@ -50,7 +50,7 @@ audio_agent = Agent(instructions='return the transcription only, no prefix or qu
 for audio_file in files[:3]:
     with logfire.span('Transcribing audio {audio_file.text!r}', audio_file=audio_file):
         model_distances: list[tuple[str, int]] = []
-        for model in 'gpt-4o-audio-preview', 'gpt-4o-mini-audio-preview', 'google-gla:gemini-2.0-flash':
+        for model in 'gpt-4o-audio-preview', 'gpt-4o-mini-audio-preview', 'google-vertex:gemini-2.0-flash':
             result = audio_agent.run_sync(['transcribe', audio_file.binary_content()], model=model)
             model_distances.append((model, levenshtein_distance(audio_file.text, result.output)))
         logfire.info(f'{model_distances}')
