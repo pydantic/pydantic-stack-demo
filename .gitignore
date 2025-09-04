@@ -14,3 +14,4 @@ wheels/
 
 node_modules/
 /distributed-frontend-example/images/
+.claude/
