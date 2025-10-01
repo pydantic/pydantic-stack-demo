@@ -21,13 +21,18 @@ async def image_generator(ctx: Context[ServerSessionT, LifespanContextT, Request
     # run the agent, using MCPSamplingModel to proxy the LLM call through the client.
     svg_result = await svg_agent.run(f'{subject=} {style=}', model=MCPSamplingModel(ctx.session))
 
-    path = Path(f'{subject}_{style}.svg')
+    path = Path(f'{slugify(subject)}_{slugify(style)}.svg')
+    logfire.info(f'writing file to {path}')
     # remove triple backticks if the svg was returned within markdown
     if m := re.search(r'^```\w*$(.+?)```$', svg_result.output, re.S | re.M):
         path.write_text(m.group(1))
     else:
         path.write_text(svg_result.output)
     return f'See {path}'
+
+
+def slugify(text: str) -> str:
+    return re.sub(r'\W+', '-', text.lower())
 
 
 if __name__ == '__main__':
