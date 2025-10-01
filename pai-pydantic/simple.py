@@ -15,7 +15,7 @@ class Person(BaseModel):
 
 
 agent = Agent(
-    'openai:gpt-4o',
+    'openai:gpt-4.1',
     output_type=Person,
     instructions='Extract information about the person',
 )
