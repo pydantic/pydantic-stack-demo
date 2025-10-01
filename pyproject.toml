@@ -8,8 +8,9 @@ dependencies = [
     "asyncpg>=0.30.0",
     "devtools>=0.12.2",
     "fastapi>=0.115.14",
-    "logfire[asyncpg,fastapi,httpx]==4.3.6",
-    "pydantic-ai>=0.3.6",
+    "logfire[asyncpg,fastapi,httpx]>=4.10",
+    "mcp>=1.15.0",
+    "pydantic-ai>=1",
 ]
 
 [dependency-groups]
