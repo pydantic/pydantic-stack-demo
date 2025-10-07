@@ -19,15 +19,15 @@ repos:
     hooks:
       - id: format
         name: Format Python
-        entry: uv
-        args: [run, ruff, format]
+        entry: make
+        args: [format]
         language: system
         types: [python]
         pass_filenames: false
-      - id: lint
-        name: lint Python
-        entry: uv
-        args: [run, ruff, check, --fix]
+      - id: typecheck
+        name: Typecheck Python
+        entry: make
+        args: [typecheck]
         language: system
         types: [python]
         pass_filenames: false

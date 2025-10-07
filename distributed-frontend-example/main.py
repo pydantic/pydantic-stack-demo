@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
 
-import httpx
 import logfire
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -80,13 +79,14 @@ async def generate_image(prompt: str) -> GenerateResponse:
 # Proxy to Logfire for client traces from the browser
 @app.post('/client-traces')
 async def client_traces(request: Request):
-    async with httpx.AsyncClient() as client:
-        response = await client.request(
-            method=request.method,
-            url=f'{logfire_base_url}v1/traces',
-            headers=dict(Authorization=logfire_token),
-            json=await request.json(),
-        )
+    assert logfire_token is not None, 'Logfire token is not set'
+    response = await http_client.request(
+        method=request.method,
+        url=f'{logfire_base_url}v1/traces',
+        headers={'Authorization': logfire_token},
+        json=await request.json(),
+    )
+    response.raise_for_status()
 
     return {
         'status_code': response.status_code,
