@@ -14,7 +14,11 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["ruff>=0.12.2", "asyncpg-stubs>=0.30.2"]
+dev = [
+    "ruff>=0.12.2",
+    "asyncpg-stubs>=0.30.2",
+    "basedpyright>=1.31.6",
+]
 
 [tool.ruff]
 line-length = 120
@@ -33,3 +37,13 @@ convention = "google"
 # don't format python in docstrings, pytest-examples takes care of it
 docstring-code-format = false
 quote-style = "single"
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+reportUnnecessaryTypeIgnoreComment = true
+reportIgnoreCommentWithoutRule = true
+reportUnusedParameter = true
+reportIncompatibleUnannotatedOverride = true
+reportImplicitAbstractClass = true
+venv = ".venv"
