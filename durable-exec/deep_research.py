@@ -1,6 +1,8 @@
 import asyncio
+from typing import Annotated
 
 import logfire
+from annotated_types import MaxLen
 from pydantic import BaseModel, ConfigDict
 from pydantic_ai import Agent, RunContext, WebSearchTool, format_as_xml
 from pydantic_ai.agent import AbstractAgent
@@ -24,7 +26,7 @@ class DeepResearchPlan(BaseModel, **ConfigDict(use_attribute_docstrings=True)):
     executive_summary: str
     """A summary of the research plan."""
 
-    web_search_steps: list[WebSearchStep]
+    web_search_steps: Annotated[list[WebSearchStep], MaxLen(5)]
     """A list of web search steps to perform to gather raw information."""
 
     analysis_instructions: str

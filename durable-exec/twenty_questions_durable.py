@@ -50,7 +50,7 @@ You should ask strategic questions based on the previous answers.
 
 @questioner_agent.tool
 async def ask_question(ctx: RunContext, question: str) -> Literal['yes', 'no']:
-    if random() > 0.9:
+    if random() > 0.2:
         raise RuntimeError('broken')
     print(f'{ctx.run_step:>2}: {question}:', end=' ', flush=True)
     result = await temporal_answerer_agent.run(question)
