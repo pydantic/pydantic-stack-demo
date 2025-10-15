@@ -1,8 +1,12 @@
 import asyncio
 import os
+import sys
 import uuid
+from datetime import timedelta
+from typing import Annotated
 
 import logfire
+from annotated_types import MaxLen
 from pydantic import BaseModel, ConfigDict
 from pydantic_ai import Agent, format_as_xml
 from pydantic_ai.common_tools.tavily import tavily_search_tool
@@ -30,7 +34,7 @@ class DeepResearchPlan(BaseModel, **ConfigDict(use_attribute_docstrings=True)):
     summary: str
     """A summary of the research plan."""
 
-    web_search_steps: list[WebSearchStep]
+    web_search_steps: Annotated[list[WebSearchStep], MaxLen(5)]
     """A list of web search steps to perform to gather raw information."""
 
     analysis_instructions: str
@@ -41,13 +45,17 @@ plan_agent = Agent(
     'anthropic:claude-sonnet-4-5',
     instructions='Analyze the users query and design a plan for deep research to answer their query.',
     output_type=DeepResearchPlan,
-    name='abstract_plan_agent',
+    name='plan_agent',
 )
 
 
 search_agent = Agent(
     'openai-responses:gpt-4.1-mini',
-    instructions='Perform a web search for the given terms and return a detailed report on the results.',
+    instructions="""
+Perform a web search for the given terms and return a concise summary of the results.
+
+Include links to original sources whenever possible.
+""",
     tools=[tavily_search_tool(os.environ['TAVILY_API_KEY'])],
     name='search_agent',
 )
@@ -60,7 +68,9 @@ Analyze the research from the previous steps and generate a report on the given 
 If the search results do not contain enough information, you may perform further searches using the
 `extra_search` tool.
 
-Your report should start with an executive summary of the results, then a detailed analysis of the findings.
+Your report should start with an executive summary of the results, then a concise analysis of the findings.
+
+Include links to original sources whenever possible.
 """,
     name='analysis_agent',
 )
@@ -75,7 +85,10 @@ async def extra_search(query: str) -> str:
 
 temporal_plan_agent = TemporalAgent(plan_agent)
 temporal_search_agent = TemporalAgent(search_agent)
-temporal_analysis_agent = TemporalAgent(analysis_agent)
+temporal_analysis_agent = TemporalAgent(
+    analysis_agent,
+    activity_config=workflow.ActivityConfig(start_to_close_timeout=timedelta(hours=1)),
+)
 
 
 @workflow.defn
@@ -114,12 +127,17 @@ async def deep_research_durable(query: str):
             AgentPlugin(temporal_analysis_agent),
         ],
     ):
-        summary = await client.execute_workflow(  # type: ignore[ReportUnknownMemberType]
-            DeepResearchWorkflow.run,
-            args=[query],
-            id=f'deep_research-{uuid.uuid4()}',
-            task_queue='deep_research',
-        )
+        resume_id = sys.argv[1] if len(sys.argv) > 1 else None
+        if resume_id is not None:
+            print('resuming existing workflow', resume_id)
+            summary = await client.get_workflow_handle(resume_id).result()  # type: ignore[ReportUnknownMemberType]
+        else:
+            summary = await client.execute_workflow(  # type: ignore[ReportUnknownMemberType]
+                DeepResearchWorkflow.run,
+                args=[query],
+                id=f'deep_research-{uuid.uuid4()}',
+                task_queue='deep_research',
+            )
         print(summary)
 
 

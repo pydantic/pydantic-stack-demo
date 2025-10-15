@@ -70,7 +70,7 @@ class TwentyQuestionsWorkflow:
         print(f'After {len(result.all_messages()) / 2}, the answer is: {result.output}')
 
 
-async def play(wait_for_id: str | None):
+async def play(resume_id: str | None):
     client = await Client.connect('localhost:7233', plugins=[PydanticAIPlugin(), LogfirePlugin()])
 
     async with Worker(
@@ -79,14 +79,13 @@ async def play(wait_for_id: str | None):
         workflows=[TwentyQuestionsWorkflow],
         plugins=[AgentPlugin(temporal_answerer_agent), AgentPlugin(temporal_questioner_agent)],
     ):
-        if wait_for_id is not None:
-            await client.get_workflow_handle(wait_for_id).result()  # type: ignore[ReportUnknownMemberType]
+        if resume_id is not None:
+            print('resuming existing workflow', resume_id)
+            await client.get_workflow_handle(resume_id).result()  # type: ignore[ReportUnknownMemberType]
         else:
-            workflow_id = f'twenty_questions-{uuid.uuid4()}'
-            print('starting workflow:', workflow_id)
             await client.execute_workflow(  # type: ignore[ReportUnknownMemberType]
                 TwentyQuestionsWorkflow.run,
-                id=workflow_id,
+                id=f'twenty_questions-{uuid.uuid4()}',
                 task_queue='twenty_questions',
             )
 
