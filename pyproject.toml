@@ -47,3 +47,7 @@ reportUnusedParameter = true
 reportIncompatibleUnannotatedOverride = true
 reportImplicitAbstractClass = true
 venv = ".venv"
+exclude = [".git", ".venv", "scratch"]
+
+[tool.codespell]
+ignore-words-list = "ans"
