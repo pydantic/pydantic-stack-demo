@@ -1,14 +1,19 @@
 import asyncio
 import sys
-from dataclasses import dataclass
+import uuid
 from random import random
 from typing import Literal
 
-from pydantic_ai import Agent, RunContext
-from pydantic_ai.durable_exec.temporal import AgentPlugin, PydanticAIPlugin, TemporalAgent
+import logfire
+from pydantic_ai import Agent
+from pydantic_ai.durable_exec.temporal import AgentPlugin, LogfirePlugin, PydanticAIPlugin, TemporalAgent
+from pydantic_ai.tools import RunContext
 from temporalio import workflow
 from temporalio.client import Client
 from temporalio.worker import Worker
+
+logfire.configure(console=False)
+logfire.instrument_pydantic_ai()
 
 secret = 'potato'
 
@@ -27,15 +32,9 @@ THE SECRET OBJECT IS: {secret}.
 temporal_answerer_agent = TemporalAgent(answerer_agent)
 
 
-@dataclass
-class GameState:
-    step: int = 0
-
-
 # Agent that asks questions to guess the object
 questioner_agent = Agent(
     'anthropic:claude-sonnet-4-0',
-    deps_type=GameState,
     instructions="""
 You are playing a question and answer game. You need to guess what object the other player is thinking of.
 Your job is to ask yes/no questions to narrow down the possibilities.
@@ -50,11 +49,10 @@ You should ask strategic questions based on the previous answers.
 
 
 @questioner_agent.tool
-async def ask_question(ctx: RunContext[GameState], question: str) -> Literal['yes', 'no']:
+async def ask_question(ctx: RunContext, question: str) -> Literal['yes', 'no']:
     if random() > 0.9:
         raise RuntimeError('broken')
-    print(f'{ctx.deps.step:>2}: {question}:', end=' ', flush=True)
-    ctx.deps.step += 1
+    print(f'{ctx.run_step:>2}: {question}:', end=' ', flush=True)
     result = await temporal_answerer_agent.run(question)
     ans = 'yes' if result.output else 'no'
     print(ans)
@@ -68,13 +66,12 @@ temporal_questioner_agent = TemporalAgent(questioner_agent)
 class TwentyQuestionsWorkflow:
     @workflow.run
     async def run(self) -> None:
-        state = GameState()
-        result = await temporal_questioner_agent.run('start', deps=state)
-        print(f'After {state.step}, the answer is: {result.output}')
+        result = await temporal_questioner_agent.run('start')
+        print(f'After {len(result.all_messages()) / 2}, the answer is: {result.output}')
 
 
-async def play(resume: bool):
-    client = await Client.connect('localhost:7233', plugins=[PydanticAIPlugin()])
+async def play(wait_for_id: str | None):
+    client = await Client.connect('localhost:7233', plugins=[PydanticAIPlugin(), LogfirePlugin()])
 
     async with Worker(
         client,
@@ -82,10 +79,11 @@ async def play(resume: bool):
         workflows=[TwentyQuestionsWorkflow],
         plugins=[AgentPlugin(temporal_answerer_agent), AgentPlugin(temporal_questioner_agent)],
     ):
-        workflow_id = 'twenty_questions'
-        if resume:
-            await client.get_workflow_handle(workflow_id).result()  # type: ignore[ReportUnknownMemberType]
+        if wait_for_id is not None:
+            await client.get_workflow_handle(wait_for_id).result()  # type: ignore[ReportUnknownMemberType]
         else:
+            workflow_id = f'twenty_questions-{uuid.uuid4()}'
+            print('starting workflow:', workflow_id)
             await client.execute_workflow(  # type: ignore[ReportUnknownMemberType]
                 TwentyQuestionsWorkflow.run,
                 id=workflow_id,
@@ -94,4 +92,4 @@ async def play(resume: bool):
 
 
 if __name__ == '__main__':
-    asyncio.run(play('resume' in sys.argv))
+    asyncio.run(play(sys.argv[1] if len(sys.argv) > 1 else None))
