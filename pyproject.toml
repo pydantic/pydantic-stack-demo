@@ -12,6 +12,7 @@ dependencies = [
     "mcp>=1.15.0",
     "pydantic-ai>=1",
     "tavily-python>=0.7.12",
+    "dbos>=2",
 ]
 
 [dependency-groups]
