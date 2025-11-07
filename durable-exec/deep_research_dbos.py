@@ -1,11 +1,12 @@
 import asyncio
 import os
 import sys
+import uuid
 from typing import Annotated, List
 
 import logfire
 from annotated_types import MaxLen
-from dbos import DBOS, DBOSConfig, WorkflowHandleAsync
+from dbos import DBOS, DBOSConfig, SetWorkflowID, WorkflowHandleAsync
 from pydantic import BaseModel, ConfigDict
 from pydantic_ai import Agent, WebSearchTool, format_as_xml
 from pydantic_ai.durable_exec.dbos import DBOSAgent
@@ -91,6 +92,7 @@ async def deep_research(query: str) -> str:
     plan = result.output
     tasks_handles: List[WorkflowHandleAsync[str]] = []
     for step in plan.web_search_steps:
+        # Asynchronously start search workflows without waiting for each to complete
         task_handle = await DBOS.start_workflow_async(search_workflow, step.search_terms)
         tasks_handles.append(task_handle)
 
@@ -117,11 +119,14 @@ async def deep_research_durable(query: str):
     DBOS(config=config)
     DBOS.launch()
     resume_id = sys.argv[1] if len(sys.argv) > 1 else None
+    wf_id = f'deep-research-{uuid.uuid4()}'
     if resume_id is not None:
         print('resuming existing workflow', resume_id)
-        handle: WorkflowHandleAsync[str] = await DBOS.retrieve_workflow_async(resume_id)
-        summary = await handle.get_result()
+        wf_id = resume_id
     else:
+        print('starting new workflow', wf_id)
+
+    with SetWorkflowID(wf_id):
         summary = await deep_research(query)
 
     print(summary)
