@@ -9,8 +9,6 @@ logfire.instrument_pydantic_ai()
 
 
 class Person(BaseModel):
-    """Definition of an historic person"""
-
     name: str
     dob: date
     city: str
@@ -28,4 +26,4 @@ agent = Agent(
     instructions='Extract information about the person',
 )
 result = agent.run_sync("Samuel lived in London and was born on Jan 28th '87")
-print(repr(result.output))
+logfire.info(f'{result.output=}')

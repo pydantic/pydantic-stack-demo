@@ -2,7 +2,11 @@ import asyncio
 from dataclasses import dataclass
 from enum import StrEnum
 
+import logfire
 from pydantic_ai import Agent, AgentRunResult, RunContext, UsageLimits
+
+logfire.configure(console=False)
+logfire.instrument_pydantic_ai()
 
 
 class Answer(StrEnum):
@@ -37,7 +41,7 @@ class GameState:
 
 # Agent that asks questions to guess the object
 questioner_agent = Agent(
-    'anthropic:claude-sonnet-4-5',
+    'openai:gpt-4.1',
     deps_type=GameState,
     instructions="""
 You are playing a question and answer game. You need to guess what object the other player is thinking of.
