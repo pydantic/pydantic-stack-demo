@@ -80,7 +80,7 @@ async def play(resume_id: str | None, answer: str) -> AgentRunResult[str]:
         # run the server with
         # docker run -e POSTGRES_HOST_AUTH_METHOD=trust --rm -it --name pg -p 5432:5432 -d postgres
         'system_database_url': 'postgresql://postgres@localhost:5432/dbos',
-        "application_version": "0.1.0",
+        'application_version': '0.1.0',
     }
     DBOS(config=config)
     DBOS.launch()

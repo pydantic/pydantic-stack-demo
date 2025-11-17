@@ -115,7 +115,7 @@ async def deep_research_durable(query: str):
         'name': 'deep_research_durable',
         'enable_otlp': True,
         'conductor_key': os.environ.get('DBOS_CONDUCTOR_KEY', None),
-        "application_version": "0.1.0",
+        'application_version': '0.1.0',
     }
     DBOS(config=config)
     DBOS.launch()
