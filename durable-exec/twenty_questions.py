@@ -5,7 +5,7 @@ from enum import StrEnum
 import logfire
 from pydantic_ai import Agent, AgentRunResult, RunContext, UsageLimits
 
-logfire.configure(console=False)
+logfire.configure(send_to_logfire='if-token-present', console=False)
 logfire.instrument_pydantic_ai()
 
 
@@ -18,7 +18,7 @@ class Answer(StrEnum):
 
 
 answerer_agent = Agent(
-    'anthropic:claude-3-5-haiku-latest',
+    'gateway/anthropic:claude-3-5-haiku-latest',
     # 'groq:openai/gpt-oss-120b',
     deps_type=str,
     instructions="""
@@ -41,7 +41,7 @@ class GameState:
 
 # Agent that asks questions to guess the object
 questioner_agent = Agent(
-    'openai:gpt-4.1',
+    'gateway/openai:gpt-4.1',
     deps_type=GameState,
     instructions="""
 You are playing a question and answer game. You need to guess what object the other player is thinking of.
