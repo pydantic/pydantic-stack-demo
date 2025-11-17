@@ -1,12 +1,11 @@
 import asyncio
-import os
 import sys
 import uuid
 from dataclasses import dataclass
 from enum import StrEnum
 
 import logfire
-from dbos import DBOS, DBOSConfig, SetWorkflowID
+from dbos import DBOS, DBOSConfig, SetWorkflowID, WorkflowHandleAsync
 from pydantic_ai import Agent, AgentRunResult, RunContext, UsageLimits
 from pydantic_ai.durable_exec.dbos import DBOSAgent
 
@@ -78,20 +77,24 @@ async def play(resume_id: str | None, answer: str) -> AgentRunResult[str]:
     config: DBOSConfig = {
         'name': 'twenty_questions_durable',
         'enable_otlp': True,
-        'conductor_key': os.environ.get('DBOS_CONDUCTOR_KEY', None),
+        # run the server with
+        # docker run -e POSTGRES_HOST_AUTH_METHOD=trust --rm -it --name pg -p 5432:5432 -d postgres
+        'system_database_url': 'postgresql://postgres@localhost:5432/dbos',
+        'application_version': '0.1.0',
     }
     DBOS(config=config)
     DBOS.launch()
-    wf_id = f'twenty-questions-{uuid.uuid4()}'
     if resume_id is not None:
         print('resuming existing workflow', resume_id)
-        wf_id = resume_id
+        # Get the workflow handle and wait for the result
+        wf_handle: WorkflowHandleAsync[AgentRunResult] = await DBOS.retrieve_workflow_async(resume_id)
+        result = await wf_handle.get_result()
     else:
+        wf_id = f'twenty-questions-{uuid.uuid4()}'
         print('starting new workflow', wf_id)
-
-    state = GameState(answer=answer)
-    with SetWorkflowID(wf_id):
-        result = await dbos_questioner_agent.run('start', deps=state, usage_limits=UsageLimits(request_limit=25))
+        state = GameState(answer=answer)
+        with SetWorkflowID(wf_id):
+            result = await dbos_questioner_agent.run('start', deps=state, usage_limits=UsageLimits(request_limit=25))
 
     print(f'After {len(result.all_messages()) / 2}, the answer is: {result.output}')
 
