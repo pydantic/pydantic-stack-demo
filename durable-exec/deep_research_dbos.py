@@ -115,6 +115,7 @@ async def deep_research_durable(query: str):
         'name': 'deep_research_durable',
         'enable_otlp': True,
         'conductor_key': os.environ.get('DBOS_CONDUCTOR_KEY', None),
+        'application_version': '0.1.0',
     }
     DBOS(config=config)
     DBOS.launch()
@@ -122,12 +123,13 @@ async def deep_research_durable(query: str):
     wf_id = f'deep-research-{uuid.uuid4()}'
     if resume_id is not None:
         print('resuming existing workflow', resume_id)
-        wf_id = resume_id
+        # Get the workflow handle and wait for the result
+        wf_handle: WorkflowHandleAsync[str] = await DBOS.retrieve_workflow_async(resume_id)
+        summary = await wf_handle.get_result()
     else:
         print('starting new workflow', wf_id)
-
-    with SetWorkflowID(wf_id):
-        summary = await deep_research(query)
+        with SetWorkflowID(wf_id):
+            summary = await deep_research(query)
 
     print(summary)
 
