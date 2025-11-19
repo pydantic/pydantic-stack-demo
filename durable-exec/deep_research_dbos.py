@@ -1,5 +1,4 @@
 import asyncio
-import os
 import sys
 import uuid
 from typing import Annotated, List
@@ -114,7 +113,7 @@ async def deep_research_durable(query: str):
     config: DBOSConfig = {
         'name': 'deep_research_durable',
         'enable_otlp': True,
-        'conductor_key': os.environ.get('DBOS_CONDUCTOR_KEY', None),
+        'system_database_url': 'postgresql://postgres@localhost:5432/dbos',
     }
     DBOS(config=config)
     DBOS.launch()
