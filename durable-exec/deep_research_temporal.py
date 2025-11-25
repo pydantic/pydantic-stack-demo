@@ -132,7 +132,7 @@ async def deep_research_durable(query: str):
             print('resuming existing workflow', resume_id)
             summary = await client.get_workflow_handle(resume_id).result()  # type: ignore[ReportUnknownMemberType]
         else:
-            summary = await client.execute_workflow(  # type: ignore[ReportUnknownMemberType]
+            summary = await client.execute_workflow(
                 DeepResearchWorkflow.run,
                 args=[query],
                 id=f'deep_research-{uuid.uuid4()}',

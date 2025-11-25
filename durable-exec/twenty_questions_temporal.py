@@ -18,7 +18,7 @@ logfire.instrument_pydantic_ai()
 secret = 'potato'
 
 answerer_agent = Agent(
-    'anthropic:claude-3-5-haiku-latest',
+    'gateway/anthropic:claude-3-5-haiku-latest',
     instructions=f"""
 You are playing a question and answer game.
 Your job is to answer yes/no questions about the secret object truthfully.
@@ -34,7 +34,7 @@ temporal_answerer_agent = TemporalAgent(answerer_agent)
 
 # Agent that asks questions to guess the object
 questioner_agent = Agent(
-    'anthropic:claude-sonnet-4-5',
+    'gateway/anthropic:claude-sonnet-4-5',
     instructions="""
 You are playing a question and answer game. You need to guess what object the other player is thinking of.
 Your job is to ask yes/no questions to narrow down the possibilities.
@@ -83,9 +83,11 @@ async def play(resume_id: str | None):
             print('resuming existing workflow', resume_id)
             await client.get_workflow_handle(resume_id).result()  # type: ignore[ReportUnknownMemberType]
         else:
+            workflow_id = f'twenty_questions-{uuid.uuid4()}'
+            print(f'{workflow_id=}')
             await client.execute_workflow(
                 TwentyQuestionsWorkflow.run,
-                id=f'twenty_questions-{uuid.uuid4()}',
+                id=workflow_id,
                 task_queue='twenty_questions',
             )
 
