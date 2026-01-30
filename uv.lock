@@ -815,6 +815,15 @@ wheels = [
 ]
 
 [[package]]
+name = "gepa"
+version = "0.0.27"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4e/99/6840f84498f2dcbfd27e8a15eeb4e637e84e9dbbd6331977b71f6ffad9c7/gepa-0.0.27.tar.gz", hash = "sha256:02ecb19e4aa6a1f5bb2994cd54b2057f25cd5e8cd662fee514303b2a8ba0a738", size = 155106, upload-time = "2026-01-28T00:33:51.72Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/bd/f9e83519099a9fd5d090520ab0c51a6278e473b914a9b32d1e812662dd3b/gepa-0.0.27-py3-none-any.whl", hash = "sha256:592beb084fd638d525edae84ca75ad8e9e9c3758e5498b933c17153addf5dd2d", size = 146454, upload-time = "2026-01-28T00:33:50.262Z" },
+]
+
+[[package]]
 name = "google-auth"
 version = "2.41.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2112,9 +2121,12 @@ dependencies = [
     { name = "dbos" },
     { name = "devtools" },
     { name = "fastapi" },
+    { name = "gepa" },
     { name = "logfire", extra = ["asyncpg", "fastapi", "httpx"] },
     { name = "mcp" },
     { name = "pydantic-ai" },
+    { name = "pydantic-evals" },
+    { name = "python-dotenv" },
     { name = "tavily-python" },
 ]
 
@@ -2131,9 +2143,12 @@ requires-dist = [
     { name = "dbos", specifier = ">=2" },
     { name = "devtools", specifier = ">=0.12.2" },
     { name = "fastapi", specifier = ">=0.115.14" },
+    { name = "gepa", specifier = ">=0.0.27" },
     { name = "logfire", extras = ["asyncpg", "fastapi", "httpx"], specifier = ">=4.10" },
     { name = "mcp", specifier = ">=1.15.0" },
     { name = "pydantic-ai", specifier = ">=1.22.0" },
+    { name = "pydantic-evals", specifier = ">=1.22.0" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "tavily-python", specifier = ">=0.7.12" },
 ]
 
