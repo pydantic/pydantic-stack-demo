@@ -6,13 +6,13 @@ to automatically optimize agent instructions.
 
 Usage:
     # Run a quick evaluation with current instructions
-    uv run python -m prompt_optimization.run_optimization eval
+    uv run python pai-gepa-prompt-optimization/run_optimization.py eval
 
     # Run optimization
-    uv run python -m prompt_optimization.run_optimization optimize
+    uv run python pai-gepa-prompt-optimization/run_optimization.py optimize
 
     # Run optimization with custom settings
-    uv run python -m prompt_optimization.run_optimization optimize --max-calls 100
+    uv run python pai-gepa-prompt-optimization/run_optimization.py optimize --max-calls 100
 """
 
 from __future__ import annotations
@@ -39,11 +39,10 @@ if not os.environ.get('OPENAI_API_KEY'):
     sys.exit(1)
 
 import logfire
+from adapter import create_adapter
+from evals import contact_dataset
 from gepa.api import optimize  # pyright: ignore[reportUnknownVariableType]
-
-from .adapter import create_adapter
-from .evals import contact_dataset
-from .task import contact_agent, extract_contact_info
+from task import contact_agent, extract_contact_info
 
 # Configure logfire for observability
 logfire.configure(

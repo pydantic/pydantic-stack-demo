@@ -21,13 +21,13 @@ uv sync
 export OPENAI_API_KEY='your-key-here'
 
 # Run evaluation with initial instructions
-uv run python -m prompt_optimization.run_optimization eval
+uv run python pai-gepa-prompt-optimization/run_optimization.py eval
 
 # Compare initial vs expert instructions
-uv run python -m prompt_optimization.run_optimization compare
+uv run python pai-gepa-prompt-optimization/run_optimization.py compare
 
 # Run optimization (this will take a while and use API credits)
-uv run python -m prompt_optimization.run_optimization optimize --max-calls 50
+uv run python pai-gepa-prompt-optimization/run_optimization.py optimize --max-calls 50
 ```
 
 ## Files

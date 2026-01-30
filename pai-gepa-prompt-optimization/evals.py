@@ -13,8 +13,7 @@ from typing import Any
 
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext
-
-from .task import ContactInfo, TaskInput
+from task import ContactInfo, TaskInput
 
 
 @dataclass
