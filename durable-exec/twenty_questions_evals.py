@@ -37,7 +37,7 @@ dataset: Dataset[str, PlayResult] = Dataset(
         Case(name='Man', inputs='man'),
         Case(name='Woman', inputs='woman'),
         Case(name='Child', inputs='child'),
-        Case(name='Bike', inputs='bike'),
+        Case(name='Bicycle', inputs='bicycle'),
         Case(name='House', inputs='house'),
     ],
     evaluators=[QuestionCount(), QnASuccess()],
@@ -62,18 +62,17 @@ async def play_eval(answer: str) -> PlayResult:
     return {
         'steps': len(result.all_messages()) / 2,
         'responses': responses,
-        'success': result.output.answer == answer,
+        'success': result.output.answer.strip().lower() == answer.strip().lower(),
     }
 
 
 async def run_evals():
     models: list[KnownModelName] = [
         'gateway/anthropic:claude-haiku-4-5',
-        'gateway/anthropic:claude-sonnet-4-5',
         'gateway/anthropic:claude-sonnet-4-6',
-        'gateway/openai:gpt-4.1',
-        'gateway/openai:gpt-4.1-mini',
-        'gateway/google-vertex:gemini-2.5-flash',
+        'gateway/openai:gpt-5-mini',
+        'gateway/openai:gpt-5-nano',
+        'google-vertex:gemini-3-flash-preview',
     ]
     for model in models:
         with questioner_agent.override(model=model):

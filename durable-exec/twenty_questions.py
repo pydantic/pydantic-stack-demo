@@ -73,7 +73,7 @@ async def ask_question(ctx: RunContext[GameState], question: str) -> Answer:
 
 async def play(answer: str) -> AgentRunResult[GameResult]:
     state = GameState(answer=answer)
-    result = await questioner_agent.run('start', deps=state, usage_limits=UsageLimits(request_limit=25))
+    result = await questioner_agent.run('start', deps=state, usage_limits=UsageLimits(request_limit=40))
     print(f'After {len(result.all_messages()) / 2}, the answer is: {result.output}')
     return result
 
