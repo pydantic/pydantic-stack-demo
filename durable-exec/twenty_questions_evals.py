@@ -41,6 +41,7 @@ dataset: Dataset[str, PlayResult] = Dataset(
         Case(name='House', inputs='house'),
     ],
     evaluators=[QuestionCount(), QnASuccess()],
+    name='20 Questions',
 )
 
 
@@ -48,6 +49,7 @@ async def play_eval(answer: str) -> PlayResult:
     try:
         result = await play(answer)
     except UsageLimitExceeded:
+        logfire.exception('usage limit exceeded')
         return {'steps': 25, 'responses': [], 'success': False}
     responses: list[Any] = []
     for message in result.all_messages():
@@ -57,11 +59,16 @@ async def play_eval(answer: str) -> PlayResult:
                     responses.append(part.content)
                 if isinstance(part, ToolCallPart):
                     responses.append(part.args)
-    return {'steps': len(result.all_messages()) / 2, 'responses': responses, 'success': True}
+    return {
+        'steps': len(result.all_messages()) / 2,
+        'responses': responses,
+        'success': result.output.answer == answer,
+    }
 
 
 async def run_evals():
     models: list[KnownModelName] = [
+        'gateway/anthropic:claude-haiku-4-5',
         'gateway/anthropic:claude-sonnet-4-5',
         'gateway/anthropic:claude-sonnet-4-6',
         'gateway/openai:gpt-4.1',
