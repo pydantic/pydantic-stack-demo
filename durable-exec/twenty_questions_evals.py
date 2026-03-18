@@ -62,11 +62,11 @@ async def play_eval(answer: str) -> PlayResult:
 
 async def run_evals():
     models: list[KnownModelName] = [
-        'anthropic:claude-sonnet-4-0',
-        'anthropic:claude-sonnet-4-5',
-        'openai:gpt-4.1',
-        'openai:gpt-4.1-mini',
-        'google-vertex:gemini-2.5-flash',
+        'gateway/anthropic:claude-sonnet-4-5',
+        'gateway/anthropic:claude-sonnet-4-6',
+        'gateway/openai:gpt-4.1',
+        'gateway/openai:gpt-4.1-mini',
+        'gateway/google-vertex:gemini-2.5-flash',
     ]
     for model in models:
         with questioner_agent.override(model=model):
