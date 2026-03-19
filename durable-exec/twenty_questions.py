@@ -3,9 +3,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 import logfire
+from pydantic import BaseModel
 from pydantic_ai import Agent, AgentRunResult, RunContext, UsageLimits
 
-logfire.configure(send_to_logfire='if-token-present', console=False)
+logfire.configure(console=False)
 logfire.instrument_pydantic_ai()
 
 
@@ -18,7 +19,7 @@ class Answer(StrEnum):
 
 
 answerer_agent = Agent(
-    'gateway/anthropic:claude-3-5-haiku-latest',
+    'gateway/anthropic:claude-haiku-4-5',
     # 'groq:openai/gpt-oss-120b',
     deps_type=str,
     instructions="""
@@ -39,10 +40,18 @@ class GameState:
     answer: str
 
 
+class GameResult(BaseModel, use_attribute_docstrings=True):
+    answer: str
+    """The exact object the other player is thinking of."""
+    explanation: str
+    """The explanation for the object the player is thinking of."""
+
+
 # Agent that asks questions to guess the object
 questioner_agent = Agent(
-    'gateway/openai:gpt-4.1',
+    'gateway/anthropic:claude-sonnet-4-5',
     deps_type=GameState,
+    output_type=GameResult,
     instructions="""
 You are playing a question and answer game. You need to guess what object the other player is thinking of.
 Your job is to ask quantitative questions to narrow down the possibilities.
@@ -62,9 +71,9 @@ async def ask_question(ctx: RunContext[GameState], question: str) -> Answer:
     return result.output
 
 
-async def play(answer: str) -> AgentRunResult[str]:
+async def play(answer: str) -> AgentRunResult[GameResult]:
     state = GameState(answer=answer)
-    result = await questioner_agent.run('start', deps=state, usage_limits=UsageLimits(request_limit=25))
+    result = await questioner_agent.run('start', deps=state, usage_limits=UsageLimits(request_limit=40))
     print(f'After {len(result.all_messages()) / 2}, the answer is: {result.output}')
     return result
 
