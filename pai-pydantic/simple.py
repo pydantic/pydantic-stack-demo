@@ -15,7 +15,7 @@ class Person(BaseModel):
 
 
 agent = Agent(
-    'openai:gpt-4.1',
+    'gateway/anthropic:claude-haiku-4-5',
     output_type=Person,
     instructions='Extract information about the person',
 )

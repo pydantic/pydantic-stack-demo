@@ -21,7 +21,7 @@ class Person(BaseModel):
 
 
 agent = Agent(
-    'openai:gpt-4.1',
+    'gateway/openai:gpt-4.1',
     output_type=Person,
     instructions='Extract information about the person',
 )

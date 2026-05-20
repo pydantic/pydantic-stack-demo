@@ -81,7 +81,7 @@ async def play(resume_id: str | None):
     ):
         if resume_id is not None:
             print('resuming existing workflow', resume_id)
-            await client.get_workflow_handle(resume_id).result()  # type: ignore[ReportUnknownMemberType]
+            await client.get_workflow_handle(resume_id).result()
         else:
             workflow_id = f'twenty_questions-{uuid.uuid4()}'
             print(f'{workflow_id=}')

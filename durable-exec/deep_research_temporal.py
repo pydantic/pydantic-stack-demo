@@ -130,7 +130,7 @@ async def deep_research_durable(query: str):
         resume_id = sys.argv[1] if len(sys.argv) > 1 else None
         if resume_id is not None:
             print('resuming existing workflow', resume_id)
-            summary = await client.get_workflow_handle(resume_id).result()  # type: ignore[ReportUnknownMemberType]
+            summary = await client.get_workflow_handle(resume_id).result()
         else:
             summary = await client.execute_workflow(
                 DeepResearchWorkflow.run,
