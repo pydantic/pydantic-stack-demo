@@ -13,6 +13,7 @@ def test_find_repo_root_points_at_workspace():
 
 def test_settings_read_env(monkeypatch):
     monkeypatch.setenv('DEMO_MODEL', 'test')
+    monkeypatch.setenv('DEMO_FAST_MODEL', 'test')
     monkeypatch.setenv('PYDANTIC_AI_GATEWAY_API_KEY', 'x')
     s = DemoSettings()
     assert s.model == 'test'
