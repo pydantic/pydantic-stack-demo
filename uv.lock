@@ -10,8 +10,10 @@ resolution-markers = [
 members = [
     "agent-basics",
     "demo-core",
+    "gateway-routing",
     "hello-world",
     "pydantic-stack-demo",
+    "rbac",
 ]
 
 [[package]]
@@ -529,6 +531,25 @@ client = [
     { name = "opentelemetry-api" },
     { name = "py-key-value-aio", extra = ["filetree", "keyring", "memory"] },
     { name = "starlette" },
+]
+
+[[package]]
+name = "gateway-routing"
+version = "0.1.0"
+source = { editable = "apps/gateway-routing" }
+dependencies = [
+    { name = "demo-core" },
+    { name = "logfire" },
+    { name = "pydantic-ai" },
+    { name = "pydantic-ai-harness" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "demo-core", editable = "packages/demo_core" },
+    { name = "logfire", specifier = ">=5.0" },
+    { name = "pydantic-ai", specifier = ">=2.43" },
+    { name = "pydantic-ai-harness", specifier = ">=0.31" },
 ]
 
 [[package]]
@@ -1382,6 +1403,20 @@ wheels = [
 ]
 
 [[package]]
+name = "pydantic-ai-harness"
+version = "0.31.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "genai-prices" },
+    { name = "httpx" },
+    { name = "pydantic-ai-slim" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/be/00/cebf7d148d1a1250645e06a4bbf09dc5d3754ec141fdb6cfbf00c6bdad50/pydantic_ai_harness-0.31.0.tar.gz", hash = "sha256:a8763f3bfa62a2c261c4c753270cd14ae774e7941a2e7184da3b776ac46db2be", size = 2608680, upload-time = "2026-09-12T01:07:06.526Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/1d/57f35d88568b9e463cf85cb04b56bbaa490072ac97090333dea314f12e91/pydantic_ai_harness-0.31.0-py3-none-any.whl", hash = "sha256:80ba336ad0c9fc2e38b90b1dbe729f7c51e4ffd7ee71ce6c1c470f25f03c3414", size = 823313, upload-time = "2026-09-12T01:07:04.722Z" },
+]
+
+[[package]]
 name = "pydantic-ai-slim"
 version = "2.43.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1725,6 +1760,25 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/da/92/1446574745d74df0c92e6aa4a7b0b3130706a4142b2d1a5869f2eaa423c6/pyyaml-6.0.3-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:16249ee61e95f858e83976573de0f5b2893b3677ba71c9dd36b9cf8be9ac6d65", size = 829923, upload-time = "2025-09-25T21:32:54.537Z" },
     { url = "https://files.pythonhosted.org/packages/f0/7a/1c7270340330e575b92f397352af856a8c06f230aa3e76f86b39d01b416a/pyyaml-6.0.3-cp314-cp314t-win_amd64.whl", hash = "sha256:4ad1906908f2f5ae4e5a8ddfce73c320c2a1429ec52eafd27138b7f1cbe341c9", size = 174062, upload-time = "2025-09-25T21:32:55.767Z" },
     { url = "https://files.pythonhosted.org/packages/f1/12/de94a39c2ef588c7e6455cfbe7343d3b2dc9d6b6b2f40c4c6565744c873d/pyyaml-6.0.3-cp314-cp314t-win_arm64.whl", hash = "sha256:ebc55a14a21cb14062aa4162f906cd962b28e2e9ea38f9b4391244cd8de4ae0b", size = 149341, upload-time = "2025-09-25T21:32:56.828Z" },
+]
+
+[[package]]
+name = "rbac"
+version = "0.1.0"
+source = { editable = "apps/rbac" }
+dependencies = [
+    { name = "demo-core" },
+    { name = "httpx" },
+    { name = "logfire" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "demo-core", editable = "packages/demo_core" },
+    { name = "httpx", specifier = ">=0.27" },
+    { name = "logfire", specifier = ">=5.0" },
+    { name = "pydantic", specifier = ">=2.10" },
 ]
 
 [[package]]
