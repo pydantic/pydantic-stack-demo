@@ -17,7 +17,7 @@ import sys
 import uuid
 
 from dbos import DBOS, DBOSConfig, SetWorkflowID
-from pydantic_ai import UsageLimits
+from pydantic_ai import UsageLimitExceeded, UsageLimits
 from pydantic_ai.durable_exec.dbos import DBOSDurability
 
 from demo_core import configure_logfire, settings
@@ -64,7 +64,11 @@ async def run(resume_id: str | None, answer: str = 'potato') -> GameResult:
 def main() -> None:
     configure_logfire('durable-exec')
     settings().require_model_credentials()
-    asyncio.run(run(sys.argv[1] if len(sys.argv) > 1 else None))
+    try:
+        asyncio.run(run(sys.argv[1] if len(sys.argv) > 1 else None))
+    except UsageLimitExceeded as e:
+        # Running out of the request budget before guessing is a normal outcome of the game.
+        print(f'The questioner ran out of questions: {e}')
 
 
 if __name__ == '__main__':
