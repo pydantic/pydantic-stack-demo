@@ -1,0 +1,30 @@
+[project]
+name = "multi-agent"
+version = "0.1.0"
+description = "Multi-agent patterns: agent-as-a-tool, plan/fan-out/analyse, harness SubAgents, and evaluating agents with Pydantic Evals"
+requires-python = ">=3.12"
+dependencies = [
+    "demo-core",
+    "pydantic>=2.10",
+    "pydantic-ai[duckduckgo]>=2.43",
+    "pydantic-ai-harness>=0.31",
+    "pydantic-evals>=2.43",
+    "logfire>=5.0",
+    "annotated-types>=0.7",
+]
+
+[project.scripts]
+multi-agent-twenty-questions = "multi_agent.twenty_questions:main"
+multi-agent-research = "multi_agent.research:main"
+multi-agent-subagents = "multi_agent.subagents:main"
+multi-agent-evals = "multi_agent.evals:main"
+
+[tool.uv.sources]
+demo-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/multi_agent"]
