@@ -8,6 +8,8 @@ endpoint, or building a `FallbackModel` chain (see apps/gateway-routing).
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 from pydantic_ai.models import Model
 from pydantic_ai.models.anthropic import AnthropicModel
 from pydantic_ai.models.google import GoogleModel
@@ -37,5 +39,6 @@ def gateway_model(api_format: str, model_name: str, *, route: str | None = None,
         model_cls = _MODEL_CLASSES[api_format]
     except KeyError:
         raise ValueError(f'Unsupported api_format {api_format!r}; expected one of {sorted(_MODEL_CLASSES)}') from None
-    provider = gateway_provider(api_format, route=route, api_key=api_key or settings().gateway_api_key)  # type: ignore[arg-type]
-    return model_cls(model_name, provider=provider)
+    provider = gateway_provider(api_format, route=route, api_key=api_key or settings().gateway_api_key)
+    # The concrete model classes share this constructor shape; the abstract base does not declare it.
+    return cast(Any, model_cls)(model_name, provider=provider)
