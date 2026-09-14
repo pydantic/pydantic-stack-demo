@@ -8,7 +8,8 @@ COPY pyproject.toml uv.lock ./
 COPY packages/demo_core ./packages/demo_core
 COPY apps/instrumentation ./apps/instrumentation
 
-RUN uv sync --frozen --package instrumentation
+RUN uv sync --frozen --no-dev --package instrumentation
+ENV PATH="/app/.venv/bin:$PATH" PYDANTIC_AI_NO_BANNER=1
 
 EXPOSE 8000
-CMD ["uv", "run", "--package", "instrumentation", "uvicorn", "instrumentation.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "instrumentation.main:app", "--host", "0.0.0.0", "--port", "8000"]

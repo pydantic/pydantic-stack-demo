@@ -8,7 +8,8 @@ COPY pyproject.toml uv.lock ./
 COPY packages/demo_core ./packages/demo_core
 COPY apps/support-agent ./apps/support-agent
 
-RUN uv sync --frozen --package support-agent
+RUN uv sync --frozen --no-dev --package support-agent
+ENV PATH="/app/.venv/bin:$PATH" PYDANTIC_AI_NO_BANNER=1
 
 EXPOSE 8000
-CMD ["uv", "run", "--package", "support-agent", "uvicorn", "support_agent.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "support_agent.main:app", "--host", "0.0.0.0", "--port", "8000"]
