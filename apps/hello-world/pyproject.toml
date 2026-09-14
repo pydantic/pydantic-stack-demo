@@ -1,0 +1,19 @@
+[project]
+name = "hello-world"
+version = "0.1.0"
+description = "The smallest possible Logfire program"
+requires-python = ">=3.12"
+dependencies = ["demo-core", "logfire>=5.0"]
+
+[project.scripts]
+hello-world = "hello_world.main:main"
+
+[tool.uv.sources]
+demo-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hello_world"]

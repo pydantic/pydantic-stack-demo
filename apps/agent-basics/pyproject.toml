@@ -1,0 +1,22 @@
+[project]
+name = "agent-basics"
+version = "0.1.0"
+description = "First Pydantic AI agents: a one-liner, tools with dependencies, structured output and validation retries"
+requires-python = ">=3.12"
+dependencies = ["demo-core", "pydantic-ai>=2.43", "httpx>=0.27", "logfire[httpx]>=5.0"]
+
+[project.scripts]
+agent-basics-hello = "agent_basics.hello:main"
+agent-basics-weather = "agent_basics.weather:main"
+agent-basics-structured = "agent_basics.structured_output:main"
+agent-basics-retry = "agent_basics.validation_retry:main"
+
+[tool.uv.sources]
+demo-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_basics"]
