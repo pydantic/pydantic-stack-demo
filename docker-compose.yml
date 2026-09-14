@@ -13,6 +13,8 @@ x-env: &env
 
 services:
   # Generic runner with every app installed; pass the script name as the command.
+  # Demos that need Postgres or Temporal expect them up first, e.g.
+  #   docker compose --profile postgres up -d && docker compose run --rm cli memory-messages
   cli:
     build:
       context: .
@@ -20,7 +22,6 @@ services:
     <<: *env
     environment:
       DATABASE_URL: postgresql://postgres@postgres:5432/postgres
-      DBOS_SYSTEM_DATABASE_URL: postgresql://postgres@postgres:5432/dbos
       TEMPORAL_ADDRESS: temporal:7233
     volumes:
       - ./output:/app/output
