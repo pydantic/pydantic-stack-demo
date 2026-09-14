@@ -5,6 +5,7 @@ from dataclasses import asdict
 
 import httpx
 import logfire
+
 from rbac import audit
 
 logfire.configure(send_to_logfire=False, console=False)

@@ -1,7 +1,8 @@
 import httpx
+from pydantic_ai.models.test import TestModel
+
 from agent_basics import structured_output, weather
 from agent_basics.hello import agent as hello_agent
-from pydantic_ai.models.test import TestModel
 
 
 def test_hello_agent():

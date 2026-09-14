@@ -2,7 +2,6 @@ from decimal import Decimal
 
 import logfire
 import pytest
-from gateway_routing import budgets, privacy
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from pydantic_ai import Agent, FallbackExceptionGroup, ModelAPIError, UsageLimitExceeded, UsageLimits
@@ -12,6 +11,8 @@ from pydantic_ai.models.function import AgentInfo, FunctionModel
 from pydantic_ai.models.test import TestModel
 from pydantic_ai.usage import RequestUsage
 from pydantic_ai_harness.spend import Budget, SpendLimitExceeded, SpendLimits
+
+from gateway_routing import budgets, privacy
 
 
 class BrokenModel(TestModel):

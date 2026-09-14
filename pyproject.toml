@@ -37,7 +37,7 @@ extend-exclude = ["apps/distributed-frontend/frontend"]
 [tool.ruff.lint]
 extend-select = ["Q", "RUF100", "C90", "UP", "I"]
 flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
-isort = { combine-as-imports = true, known-first-party = ["demo_core"] }
+isort = { combine-as-imports = true, known-first-party = ["demo_core", "hello_world", "agent_basics", "instrumentation", "distributed_frontend", "mcp_sampling", "memory", "gateway_routing", "rbac", "multi_agent", "durable_exec", "prompt_optimization", "support_agent"] }
 mccabe = { max-complexity = 15 }
 
 [tool.ruff.lint.pydocstyle]
