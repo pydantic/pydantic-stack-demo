@@ -7,6 +7,7 @@ metrics so the Logfire host panels have something to show.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import logfire
@@ -39,7 +40,8 @@ def configure_logfire(
     instance = logfire.configure(
         service_name=service_name,
         environment=environment or s.logfire_environment,
-        send_to_logfire='if-token-present',
+        # An explicit LOGFIRE_SEND_TO_LOGFIRE (tests set it to false) wins over our default.
+        send_to_logfire=None if 'LOGFIRE_SEND_TO_LOGFIRE' in os.environ else 'if-token-present',
         console=False if not console else None,
         **configure_kwargs,  # type: ignore[arg-type]
     )
