@@ -29,3 +29,4 @@ apps/distributed-frontend/frontend/dist/
 # Editors / agents
 .claude/settings.local.json
 /scratch/
+.claude/worktrees/
