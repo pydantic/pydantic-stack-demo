@@ -12,6 +12,7 @@ and sends traces to the Logfire project in .env. Demos that need extra infrastru
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 import time
@@ -24,6 +25,7 @@ class Demo:
     command: list[str]
     needs_infra: bool = False
     timeout: int = 240
+    server: tuple[str, ...] | None = None  # a service to start first (stopped afterwards)
 
 
 DEMOS: list[Demo] = [
@@ -32,7 +34,11 @@ DEMOS: list[Demo] = [
     Demo('agent-basics', ['agent-basics-weather']),
     Demo('agent-basics', ['agent-basics-structured']),
     Demo('agent-basics', ['agent-basics-retry']),
-    Demo('instrumentation', ['instrumentation-traffic', '--count', '3', '--serve']),
+    Demo(
+        'instrumentation',
+        ['instrumentation-traffic', '--count', '3', '--interval', '0', '--base-url', 'http://127.0.0.1:8765'],
+        server=('instrumentation-serve',),
+    ),
     Demo('gateway-routing', ['gateway-routing-providers']),
     Demo('gateway-routing', ['gateway-routing-fallback']),
     Demo('gateway-routing', ['gateway-routing-budgets']),
@@ -41,13 +47,14 @@ DEMOS: list[Demo] = [
     Demo('multi-agent', ['multi-agent-twenty-questions']),
     Demo('multi-agent', ['multi-agent-research'], timeout=600),
     Demo('multi-agent', ['multi-agent-subagents']),
+    Demo('multi-agent', ['multi-agent-evals'], timeout=900),
     Demo('mcp-sampling', ['mcp-sampling-client']),
     Demo('support-agent', ['support-agent-evals-offline'], timeout=600),
     Demo('support-agent', ['support-agent-traffic', '--count', '2', '--interval', '0', '--judge-all']),
     Demo('prompt-optimization', ['prompt-optimization', 'eval']),
     Demo('memory', ['memory-messages'], needs_infra=True),
     Demo('memory', ['memory-tools'], needs_infra=True),
-    Demo('durable-exec', ['durable-exec-dbos-twenty-questions'], needs_infra=True, timeout=600),
+    Demo('durable-exec', ['durable-exec-dbos-twenty-questions'], timeout=600),
     Demo('durable-exec', ['durable-exec-temporal-twenty-questions'], needs_infra=True, timeout=600),
 ]
 
@@ -64,11 +71,24 @@ def main() -> int:
         name = ' '.join(demo.command)
         print(f'\n=== {name}', flush=True)
         start = time.monotonic()
+        server = None
+        if demo.server:
+            server = subprocess.Popen(
+                ['uv', 'run', *demo.server],
+                env={**os.environ, 'PORT': '8765'},
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            time.sleep(6)
         try:
             proc = subprocess.run(['uv', 'run', *demo.command], timeout=demo.timeout, capture_output=True, text=True)
             ok, tail = proc.returncode == 0, (proc.stdout + proc.stderr).strip().splitlines()[-3:]
         except subprocess.TimeoutExpired:
             ok, tail = False, ['timed out']
+        finally:
+            if server is not None:
+                server.terminate()
+                server.wait(timeout=10)
         elapsed = time.monotonic() - start
         print('\n'.join(tail))
         results.append((demo, ok, elapsed, tail[-1] if tail else ''))

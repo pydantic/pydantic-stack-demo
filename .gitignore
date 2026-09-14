@@ -30,3 +30,4 @@ apps/distributed-frontend/frontend/dist/
 .claude/settings.local.json
 /scratch/
 .claude/worktrees/
+output/

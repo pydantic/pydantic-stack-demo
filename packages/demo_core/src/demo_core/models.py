@@ -38,4 +38,4 @@ def gateway_model(api_format: str, model_name: str, *, route: str | None = None,
     except KeyError:
         raise ValueError(f'Unsupported api_format {api_format!r}; expected one of {sorted(_MODEL_CLASSES)}') from None
     provider = gateway_provider(api_format, route=route, api_key=api_key or settings().gateway_api_key)  # type: ignore[arg-type]
-    return model_cls(model_name, provider=provider)  # type: ignore[call-arg]
+    return model_cls(model_name, provider=provider)

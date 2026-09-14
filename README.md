@@ -64,7 +64,7 @@ look at in Logfire, which docs it is based on).
 | --- | --- | --- |
 | [multi-agent](apps/multi-agent) | How do agents call other agents: agent-as-tool, plan → parallel fan-out → analysis, and the Harness `SubAgents` capability? Plus evals of the pattern across models. | `uv run multi-agent-twenty-questions`, `-research`, `-subagents`, `-evals` |
 | [mcp-sampling](apps/mcp-sampling) | How does an MCP server make LLM calls through the client's model (MCP sampling), with both sides traced? | `uv run mcp-sampling-client` |
-| [durable-exec](apps/durable-exec) | How do I make a multi-agent workflow survive crashes and restarts with DBOS or Temporal? | `docker compose --profile durable-exec up -d`, then `uv run durable-exec-dbos-…` / `-temporal-…` |
+| [durable-exec](apps/durable-exec) | How do I make a multi-agent workflow survive crashes and restarts with DBOS or Temporal, and resume it by workflow id? | `uv run durable-exec-dbos-twenty-questions` (SQLite, no infra); `docker compose --profile temporal up -d`, then `uv run durable-exec-temporal-research` |
 
 ### Evaluate and improve
 
