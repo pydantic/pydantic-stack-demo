@@ -1,0 +1,32 @@
+[project]
+name = "durable-exec"
+version = "0.1.0"
+description = "The multi-agent workflows made durable with DBOS and Temporal: crash mid-run, resume from the last completed step"
+requires-python = ">=3.12"
+dependencies = [
+    "demo-core",
+    "multi-agent",
+    "pydantic>=2.10",
+    "pydantic-ai[dbos,temporal]>=2.43",
+    "logfire>=5.0",
+    "dbos>=2.10",
+    "temporalio>=1.24",
+    "opentelemetry-instrumentation-logging>=0.50b0",
+]
+
+[project.scripts]
+durable-exec-dbos-twenty-questions = "durable_exec.dbos_twenty_questions:main"
+durable-exec-dbos-research = "durable_exec.dbos_research:main"
+durable-exec-temporal-twenty-questions = "durable_exec.temporal_twenty_questions:main"
+durable-exec-temporal-research = "durable_exec.temporal_research:main"
+
+[tool.uv.sources]
+demo-core = { workspace = true }
+multi-agent = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/durable_exec"]
