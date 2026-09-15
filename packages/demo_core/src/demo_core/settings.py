@@ -27,12 +27,20 @@ def find_repo_root(start: Path | None = None) -> Path | None:
 
 
 def load_env(app_dir: Path | str | None = None) -> None:
-    """Load `<repo>/.env`, then `<app_dir>/.env`, without overriding real environment variables."""
+    """Load `<repo>/.env`, then `<app_dir>/.env`, without overriding real environment variables.
+
+    One Logfire *project API key* with "Send telemetry" and Gateway access can stand in for
+    both the write token and the Gateway key, so if only `LOGFIRE_API_KEY` is set it is
+    copied into `LOGFIRE_TOKEN` and `PYDANTIC_AI_GATEWAY_API_KEY`.
+    """
     root = find_repo_root()
     if root is not None:
         load_dotenv(root / '.env', override=False)
     if app_dir is not None:
         load_dotenv(Path(app_dir) / '.env', override=False)
+    if api_key := os.environ.get('LOGFIRE_API_KEY'):
+        os.environ.setdefault('LOGFIRE_TOKEN', api_key)
+        os.environ.setdefault('PYDANTIC_AI_GATEWAY_API_KEY', api_key)
 
 
 class DemoSettings(BaseSettings):

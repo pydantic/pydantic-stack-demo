@@ -16,17 +16,52 @@ You need [uv](https://docs.astral.sh/uv/) and Python 3.12+. Docker is optional.
 git clone https://github.com/pydantic/pydantic-stack-demo
 cd pydantic-stack-demo
 uv sync --all-packages          # one virtualenv with every demo installed
-cp .env.example .env            # then fill in the two keys below
+cp .env.example .env            # then add one key, see Authentication below
 uv run hello-world              # one span in Logfire
 uv run agent-basics-weather     # an agent with tools, traced end to end
 ```
 
-The two keys that matter (everything else in `.env.example` is optional):
+### Authentication
 
-| Variable | Where to get it | What it unlocks |
-| --- | --- | --- |
-| `LOGFIRE_TOKEN` | Logfire → your project → **Settings → Write tokens** ([docs](https://pydantic.dev/docs/logfire/how-to-guides/create-write-tokens/)) | Traces, metrics and eval results in Logfire. Without it the demos still run and print to the console. |
-| `PYDANTIC_AI_GATEWAY_API_KEY` | Logfire → **Gateway → API Keys** ([docs](https://pydantic.dev/docs/logfire/reference/advanced/gateway/)) | Every model call. One key covers OpenAI, Anthropic and Google; set `DEMO_MODEL=openai:gpt-5.2` plus `OPENAI_API_KEY` instead if you want to call a provider directly. |
+The demos need two things: somewhere to send traces (a Logfire project) and a way to call
+models (the Pydantic AI Gateway). One key can do both.
+
+**Option 1: one project API key (simplest).** In Logfire open your project, then
+**Settings → API Keys → New API Key**, tick **Send telemetry** and the Gateway access
+capability, and put the key in `.env`:
+
+```bash
+LOGFIRE_API_KEY=pylf_v1_...
+```
+
+`demo_core` uses it as the write token *and* as the Gateway key. Gateway calls are billed
+to the organization's Gateway balance (or your own provider credentials if you configured
+BYOK providers), and the same key works for the Platform API demos that only need
+project scopes.
+
+**Option 2: least privilege.** A write token for traces (**Settings → Write tokens**) and
+a Gateway key for models (**Gateway → API Keys**, where you can also set daily, weekly
+and monthly spend caps on the key):
+
+```bash
+LOGFIRE_TOKEN=pylf_v1_...
+PYDANTIC_AI_GATEWAY_API_KEY=pylf_v1_...
+```
+
+**Local development without a token.** `uv run logfire auth` (opens the browser), then
+`uv run logfire projects use <project>` writes `.logfire/logfire_credentials.json`, which
+the SDK picks up automatically. Docker containers do not see that file, so use one of the
+options above for `docker compose`.
+
+**Direct to a provider instead of the Gateway.** Set `DEMO_MODEL=openai:gpt-5.2` (or any
+Pydantic AI model string) plus that provider's own key, for example `OPENAI_API_KEY`.
+
+Without any Logfire credential the demos still run and print spans to the console; without
+a model credential the agent demos stop with a one-line message saying what to set.
+
+Docs: [API keys](https://pydantic.dev/docs/logfire/reference/advanced/use-api-keys/) ·
+[Write tokens](https://pydantic.dev/docs/logfire/how-to-guides/create-write-tokens/) ·
+[AI Gateway](https://pydantic.dev/docs/logfire/reference/advanced/gateway/)
 
 Every command in this README runs from the repo root. `uv run <script>` works because
 `uv sync --all-packages` installs each app's `[project.scripts]` into the shared virtualenv.
