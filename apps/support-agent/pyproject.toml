@@ -1,0 +1,30 @@
+[project]
+name = "support-agent"
+version = "0.1.0"
+description = "Reference support agent with the three-layer eval loop: offline dataset, narrow LLM judge, online evaluation on live traffic"
+requires-python = ">=3.12"
+dependencies = [
+    "demo-core",
+    "pydantic>=2.10",
+    "pydantic-ai>=2.43",
+    "pydantic-evals>=2.43",
+    "logfire[fastapi]>=5.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+]
+
+[project.scripts]
+support-agent-serve = "support_agent.main:main"
+support-agent-evals-offline = "support_agent.evals.offline:main"
+support-agent-traffic = "support_agent.evals.online:main"
+support-agent-evals-publish = "support_agent.evals.publish:main"
+
+[tool.uv.sources]
+demo-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/support_agent"]

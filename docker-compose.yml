@@ -1,0 +1,94 @@
+# Every service is behind a Compose profile, so a bare `docker compose up` starts nothing.
+#   docker compose --profile instrumentation up --build     # one service demo
+#   docker compose --profile memory up -d postgres           # just the infrastructure a script needs
+#   docker compose run --rm cli agent-basics-weather         # any script demo, in Docker
+#   docker compose --profile all up --build                  # everything
+# Host ports are ${NAME_PORT:-default} substitutions resolved from the repo-root .env
+# (see .env.example). Credentials come from the same .env via env_file.
+
+x-env: &env
+  env_file:
+    - path: .env
+      required: false
+
+services:
+  # Generic runner with every app installed; pass the script name as the command.
+  # Demos that need Postgres or Temporal expect them up first, e.g.
+  #   docker compose --profile postgres up -d && docker compose run --rm cli memory-messages
+  cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    <<: *env
+    environment:
+      DATABASE_URL: postgresql://postgres@postgres:5432/postgres
+      TEMPORAL_ADDRESS: temporal:7233
+    volumes:
+      - ./output:/app/output
+    profiles: ["cli", "all"]
+
+  instrumentation:
+    build:
+      context: .
+      dockerfile: apps/instrumentation/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+      - path: apps/instrumentation/.env
+        required: false
+    ports:
+      - "${INSTRUMENTATION_PORT:-8001}:8000"
+    profiles: ["instrumentation", "all"]
+
+  support-agent:
+    build:
+      context: .
+      dockerfile: apps/support-agent/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+      - path: apps/support-agent/.env
+        required: false
+    ports:
+      - "${SUPPORT_AGENT_PORT:-8002}:8000"
+    profiles: ["support-agent", "all"]
+
+  distributed-frontend-backend:
+    build:
+      context: .
+      dockerfile: apps/distributed-frontend/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+      - path: apps/distributed-frontend/.env
+        required: false
+    ports:
+      - "${DISTRIBUTED_BACKEND_PORT:-8003}:8000"
+    profiles: ["distributed-frontend", "all"]
+
+  # Shared infrastructure
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    profiles: ["postgres", "memory", "durable-exec", "all"]
+
+  temporal:
+    image: temporalio/temporal:latest
+    command: server start-dev --ip 0.0.0.0
+    ports:
+      - "${TEMPORAL_PORT:-7233}:7233"
+      - "${TEMPORAL_UI_PORT:-8233}:8233"
+    profiles: ["temporal", "durable-exec", "all"]
+
+volumes:
+  postgres_data:

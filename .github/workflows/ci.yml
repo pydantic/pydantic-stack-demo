@@ -1,28 +1,34 @@
 name: CI
 on:
   push:
-    branches:
-      - main
-    tags:
-      - "**"
+    branches: [main]
   pull_request: {}
 
 env:
   COLUMNS: 150
-  UV_PYTHON: 3.13
   UV_FROZEN: "1"
+  LOGFIRE_SEND_TO_LOGFIRE: "false"
+  PYDANTIC_AI_NO_BANNER: "1"
 
 jobs:
-  pre-commit:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+          python-version: "3.12"
       - run: uv sync --all-packages
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit|${{ env.UV_PYTHON }}|${{ hashFiles('.pre-commit-config.yaml') }}
-      - run: uvx pre-commit run --color=always --all-files --verbose
+      - run: uv run ruff format --check
+      - run: uv run ruff check
+      - run: uv run basedpyright
+      - run: uv run pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env
+      - run: docker compose --profile all config --quiet
+      - run: docker compose --profile all build

@@ -1,20 +1,33 @@
-# Python-generated files
+# Python
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
-
-# Virtual environments
 .venv
+.pytest_cache/
+.ruff_cache/
+
+# Credentials and local state: never commit these
+.env
+.env.*
+!.env.example
+.logfire/
+
+# Demo output
+**/images/
 *.svg
-
-/fastapi-example/images/
-
-node_modules/
-/distributed-frontend-example/images/
-.claude/
-/scratch/
-
 *.sqlite
+*.sqlite3
+*.db
+
+# JS
+node_modules/
+apps/distributed-frontend/frontend/dist/
+
+# Editors / agents
+.claude/settings.local.json
+/scratch/
+.claude/worktrees/
+output/

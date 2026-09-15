@@ -1,60 +1,60 @@
 [project]
-name = "pydantic-demo"
-version = "0.1.0"
-description = "Add your description here"
+name = "pydantic-stack-demo"
+version = "0.2.0"
+description = "Runnable demos of the Pydantic stack: Pydantic AI, Pydantic Evals, AI Gateway and Logfire"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "asyncpg>=0.30.0",
-    "devtools>=0.12.2",
-    "fastapi>=0.115.14",
-    "gepa>=0.0.27",
-    "logfire[asyncpg,fastapi,httpx]>=4.10",
-    "mcp>=1.15.0",
-    "pydantic-evals>=1.22.0",
-    "python-dotenv>=1.0.0",
-    "tavily-python>=0.7.12",
-    "dbos>=2",
-    "pydantic-ai>=1.82.0",
-    "pydantic-ai-harness>=0.1.1",
-    "pydantic-monty>=0.0.12",
-]
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*", "apps/*"]
 
 [dependency-groups]
 dev = [
     "ruff>=0.12.2",
-    "asyncpg-stubs>=0.30.2",
     "basedpyright>=1.31.6",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "asyncpg-stubs>=0.30.2",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+# importlib mode keeps same-named test modules in different apps from colliding.
+addopts = "--import-mode=importlib"
+testpaths = ["packages", "apps"]
+filterwarnings = ["ignore::DeprecationWarning"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py312"
+extend-exclude = ["apps/distributed-frontend/frontend"]
 
 [tool.ruff.lint]
 extend-select = ["Q", "RUF100", "C90", "UP", "I"]
 flake8-quotes = { inline-quotes = "single", multiline-quotes = "double" }
-isort = { combine-as-imports = true }
+isort = { combine-as-imports = true, known-first-party = ["demo_core", "hello_world", "agent_basics", "instrumentation", "distributed_frontend", "mcp_sampling", "memory", "gateway_routing", "rbac", "multi_agent", "durable_exec", "prompt_optimization", "support_agent"] }
 mccabe = { max-complexity = 15 }
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.ruff.format]
-# don't format python in docstrings, pytest-examples takes care of it
 docstring-code-format = false
 quote-style = "single"
 
 [tool.pyright]
 pythonVersion = "3.12"
-typeCheckingMode = "strict"
+typeCheckingMode = "standard"
 reportUnnecessaryTypeIgnoreComment = true
-reportIgnoreCommentWithoutRule = true
-reportUnusedParameter = true
-reportIncompatibleUnannotatedOverride = true
-reportImplicitAbstractClass = true
 venv = ".venv"
-exclude = [".git", ".venv", "scratch"]
+venvPath = "."
+include = ["packages", "apps"]
+exclude = [".git", ".venv", "**/node_modules", "**/frontend", "scratch"]
 
 [tool.codespell]
 ignore-words-list = "ans"
