@@ -25,7 +25,11 @@ def test_repo_root_from_app_dir():
 
 
 def test_one_api_key_covers_token_and_gateway(monkeypatch):
-    import demo_core.settings as settings_module
+    import importlib
+
+    settings_module = importlib.import_module(
+        'demo_core.settings'
+    )  # `demo_core.settings` the attribute is the function
 
     monkeypatch.setattr(settings_module, 'find_repo_root', lambda start=None: None)  # ignore a developer .env
     monkeypatch.delenv('LOGFIRE_TOKEN', raising=False)
