@@ -1,4 +1,5 @@
 import os
+from base64 import b64decode
 from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import uuid4
@@ -63,16 +64,14 @@ class GenerateResponse(BaseModel):
 
 @app.post('/generate')
 async def generate_image(prompt: str) -> GenerateResponse:
-    response = await openai_client.images.generate(prompt=prompt, model='dall-e-3')
+    response = await openai_client.images.generate(prompt=prompt, model='gpt-image-2.6-flare', output_format='png')
 
     assert response.data, 'No image in response'
 
-    image_url = response.data[0].url
-    assert image_url, 'No image URL in response'
-    r = await http_client.get(image_url)
-    r.raise_for_status()
-    path = f'{uuid4().hex}.jpg'
-    (image_dir / path).write_bytes(r.content)
+    image_data = response.data[0].b64_json
+    assert image_data, 'No image data in response'
+    path = f'{uuid4().hex}.png'
+    (image_dir / path).write_bytes(b64decode(image_data, validate=True))
     return GenerateResponse(next_url=f'/static/{path}')
 
 
